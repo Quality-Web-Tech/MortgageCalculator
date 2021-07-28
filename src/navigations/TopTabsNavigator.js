@@ -25,7 +25,7 @@ const TopTabNavigator = ({navigation, route}) => {
           borderWidth: 2,
           width: 55,
           left: '6%',
-          bottom: 1,
+          bottom: 2,
           borderRadius: 2,
           borderColor: colors.white,
         },

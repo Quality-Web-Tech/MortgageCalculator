@@ -16,7 +16,7 @@ export default function Home() {
       <TextInput
         reverse
         label="Interest Rate"
-        icon={<FontAwesome5 name="percent" size={variables.iconSizeSmall} color={colors.gray400} />}
+        icon={<FontAwesome5 name="percent" size={variables.iconSizeExtraSmall} color={colors.gray400} />}
       />
 
       <TextInput
