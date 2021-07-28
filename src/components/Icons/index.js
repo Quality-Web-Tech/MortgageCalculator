@@ -1,5 +1,4 @@
 import React from 'react'
-import styles from 'styles/styles'
 import variables from 'styles/variables'
 import colors from 'styles/colors'
 import {Ionicons} from '@expo/vector-icons'
@@ -11,7 +10,7 @@ const MenuBar = () => {
   return (
     <Ionicons
       name="ios-menu"
-      size={variables.iconSizeNormal}
+      size={variables.iconSizeMedium}
       color={colors.white}
       onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
     />
