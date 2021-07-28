@@ -10,6 +10,6 @@ export default {
   },
 
   p3: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
   },
 }

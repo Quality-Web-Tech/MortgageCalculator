@@ -19,7 +19,7 @@ const ScreenWrapper = ({style = {}, ...props}) => {
   return (
     <SafeAreaInsetsContext.Consumer>
       {insets => {
-        return <View style={[style, styles.flex1, getSafeAreaPadding(insets)]} {...props} />
+        return <View style={[styles.flex1, getSafeAreaPadding(insets), style]} {...props} />
       }}
     </SafeAreaInsetsContext.Consumer>
   )

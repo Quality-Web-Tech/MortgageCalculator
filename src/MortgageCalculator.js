@@ -1,13 +1,11 @@
-import {StatusBar} from 'expo-status-bar'
 import React from 'react'
-import {Text} from 'react-native'
-import {Container} from './components'
+import {Text, View} from 'react-native'
 import fontFamily from './styles/fontFamily'
 import colors from './styles/colors'
 
-export default function App() {
+export default function App({navigation}) {
   return (
-    <Container style={{borderWidth: 1, borderColor: 'red'}}>
+    <View style={{borderWidth: 1, borderColor: 'red'}}>
       <Text
         style={{
           fontFamily: fontFamily.MONTSERRAT_REGULAR,
@@ -17,7 +15,6 @@ export default function App() {
       >
         Calculator Mortgage
       </Text>
-      <StatusBar style="auto" />
-    </Container>
+    </View>
   )
 }

@@ -1,3 +1,5 @@
 export {default as ErrorBoundary} from './ErrorBoundary'
 export {default as ScreenWrapper} from './ScreenWrapper'
 export {default as Container} from './Container'
+export {default as StatusBar} from './StatusBar'
+export {MenuBar} from './Icons'
