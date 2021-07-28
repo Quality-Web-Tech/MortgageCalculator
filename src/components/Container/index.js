@@ -1,7 +1,7 @@
 import React from 'react'
 import {View} from 'react-native'
 import ScreenWrapper from '../ScreenWrapper'
-import styles from '../../styles/styles'
+import styles from '/styles/styles'
 
 const Container = ({style = {}, ...props}) => {
   return (
