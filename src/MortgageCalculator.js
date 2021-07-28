@@ -1,25 +1,23 @@
 import {StatusBar} from 'expo-status-bar'
 import React from 'react'
-import {StyleSheet, Text, View} from 'react-native'
+import {Text} from 'react-native'
+import {Container} from './components'
 import fontFamily from './styles/fontFamily'
 import colors from './styles/colors'
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text style={{fontFamily: fontFamily.MONTSERRAT_BOLD, fontSize: 20, color: colors.green}}>
+    <Container style={{borderWidth: 1, borderColor: 'red'}}>
+      <Text
+        style={{
+          fontFamily: fontFamily.MONTSERRAT_REGULAR,
+          fontSize: 14,
+          color: colors.gray500,
+        }}
+      >
         Calculator Mortgage
       </Text>
       <StatusBar style="auto" />
-    </View>
+    </Container>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-})
