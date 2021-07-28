@@ -1,21 +1,14 @@
-import {StatusBar} from 'expo-status-bar'
 import React from 'react'
-import {StyleSheet, Text, View} from 'react-native'
+import AppLoading from 'expo-app-loading'
+import useFonts from './src/hooks/useFonts'
+import MortgageCalculator from './src/MortgageCalculator'
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Mortgage app init 2!</Text>
-      <StatusBar style="auto" />
-    </View>
-  )
-}
+  const [loaded] = useFonts()
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-})
+  if (!loaded) {
+    return <AppLoading />
+  }
+
+  return <MortgageCalculator />
+}
