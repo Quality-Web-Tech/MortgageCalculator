@@ -11,4 +11,5 @@ export default {
   green: '#4ADE80',
   violet: '#A78BFA',
   transparent: 'transparent',
+  error: '#DC2626',
 }

@@ -24,7 +24,7 @@ export default function Home() {
 
   const handleConfirm = startDate => {
     Keyboard.dismiss()
-    updateBasicForm({...basic, startDate}, dispatch)
+    updateBasicForm('startDate', startDate, dispatch)
 
     hideDatePicker()
   }
@@ -33,23 +33,25 @@ export default function Home() {
     <Container>
       <TextInput
         label="Mortgage Amount"
+        error={basic.error.mortgageAmount}
         value={basic.mortgageAmount}
         icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
-        onChangeText={mortgageAmount => updateBasicForm({...basic, mortgageAmount}, dispatch)}
+        onChangeText={mortgageAmount => updateBasicForm('mortgageAmount', mortgageAmount, dispatch)}
       />
 
       <LoanTerm
         leftLabel="Length of Loan"
         rightLabel="Years"
         loanTerm={basic.loanTerm}
-        onChangeTerm={loanTerm => updateBasicForm({...basic, loanTerm}, dispatch)}
+        onChangeTerm={loanTerm => updateBasicForm('loanTerm', loanTerm, dispatch)}
       />
       <TextInput
         reverse
         value={basic.interest}
         label="Interest Rate"
+        error={basic.error.interest}
         icon={<FontAwesome5 name="percent" size={variables.iconSizeExtraSmall} color={colors.gray400} />}
-        onChangeText={interest => updateBasicForm({...basic, interest}, dispatch)}
+        onChangeText={interest => updateBasicForm('interest', interest, dispatch)}
       />
 
       <TextInput
