@@ -5,8 +5,7 @@ import colors from 'styles/colors'
 import themes from 'styles/themes'
 import variables from 'styles/variables'
 
-const TextInput = ({label}) => {
-  const [selected, setSelected] = useState(false)
+const TextInput = ({label, active, ...props}) => {
   return (
     <Pressable
       style={{
@@ -17,15 +16,15 @@ const TextInput = ({label}) => {
         paddingHorizontal: 12,
         alignItems: 'center',
         borderRadius: 8,
-        backgroundColor: selected ? colors.gray500 : colors.white,
+        backgroundColor: active ? colors.gray500 : colors.white,
       }}
-      onPress={() => setSelected(true)}
+      {...props}
     >
       <Text
         style={{
           fontFamily: fontFamily.MONTSERRAT_REGULAR,
           fontSize: variables.fontSizeMedium,
-          color: selected ? colors.white : colors.gray500,
+          color: active ? colors.white : colors.gray500,
         }}
       >
         {label}

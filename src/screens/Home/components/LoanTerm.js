@@ -4,6 +4,8 @@ import fontFamily from 'styles/fontFamily'
 import colors from 'styles/colors'
 import {Button} from 'components'
 
+const terms = [10, 15, 20, 30]
+
 const Label = ({label}) => (
   <Text
     style={{
@@ -16,8 +18,12 @@ const Label = ({label}) => (
   </Text>
 )
 
-const LoanLength = ({leftLabel, rightLabel}) => {
-  const [selected, setSelected] = useState(false)
+const LoanTerm = ({leftLabel, rightLabel}) => {
+  const [selected, setSelected] = useState(20)
+
+  const selectYearTerm = year => {
+    setSelected(year)
+  }
   return (
     <View style={{marginVertical: 8}}>
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -25,13 +31,12 @@ const LoanLength = ({leftLabel, rightLabel}) => {
         <Label label={rightLabel} />
       </View>
       <View style={{marginVertical: 8, flexDirection: 'row', justifyContent: 'space-between'}}>
-        <Button label={10} />
-        <Button label={15} />
-        <Button label={20} />
-        <Button label={30} />
+        {terms.map(year => (
+          <Button key={year} label={year} active={year === selected} onPress={() => selectYearTerm(year)} />
+        ))}
       </View>
     </View>
   )
 }
 
-export default LoanLength
+export default LoanTerm

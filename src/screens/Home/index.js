@@ -3,7 +3,7 @@ import colors from 'styles/colors'
 import {MaterialIcons, FontAwesome5} from '@expo/vector-icons'
 import variables from 'styles/variables'
 import {Container, TextInput} from 'components'
-import LoanLength from './components/LoanLength'
+import LoanTerm from './components/LoanTerm'
 
 export default function Home() {
   return (
@@ -14,7 +14,7 @@ export default function Home() {
         onChangeText={a => console.log(a)}
       />
 
-      <LoanLength leftLabel="Length of Loan" rightLabel="Years" />
+      <LoanTerm leftLabel="Length of Loan" rightLabel="Years" />
       <TextInput
         reverse
         label="Interest Rate"
