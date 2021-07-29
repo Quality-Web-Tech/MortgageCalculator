@@ -1,16 +1,21 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {Keyboard} from 'react-native'
 import colors from 'styles/colors'
 import {MaterialIcons, FontAwesome5} from '@expo/vector-icons'
 import variables from 'styles/variables'
 import {Container, TextInput} from 'components'
 import LoanTerm from './components/LoanTerm'
-import moment from 'moment'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
-import {useBasicMortgageCalculator, updateBasicForm} from '../../context/basicMortgageCalculator'
+import {
+  useBasicMortgageCalculator,
+  updateBasicForm,
+  updateBasicCalculation,
+} from '../../context/basicMortgageCalculator'
+import {formatDate, formatNumber} from '../../utils/formatter'
 
 export default function Home() {
   const [{basic}, dispatch] = useBasicMortgageCalculator()
+  const {mortgageAmount, loanTerm, interest, startDate} = basic
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
 
@@ -29,12 +34,17 @@ export default function Home() {
     hideDatePicker()
   }
 
+  // use useCallBack here
+  useEffect(() => {
+    updateBasicCalculation(dispatch)
+  }, [mortgageAmount, loanTerm, interest, startDate])
+
   return (
     <Container>
       <TextInput
         label="Mortgage Amount"
         error={basic.error.mortgageAmount}
-        value={basic.mortgageAmount}
+        value={formatNumber(mortgageAmount)}
         icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         onChangeText={mortgageAmount => updateBasicForm('mortgageAmount', mortgageAmount, dispatch)}
       />
@@ -42,7 +52,7 @@ export default function Home() {
       <LoanTerm
         leftLabel="Length of Loan"
         rightLabel="Years"
-        loanTerm={basic.loanTerm}
+        loanTerm={loanTerm}
         onChangeTerm={loanTerm => updateBasicForm('loanTerm', loanTerm, dispatch)}
       />
       <TextInput
@@ -57,7 +67,7 @@ export default function Home() {
       <TextInput
         reverse
         clickable={true}
-        value={moment(basic.startDate).format('MMMM DD, YYYY')}
+        value={formatDate(startDate)}
         label="Start Date"
         icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
         onPress={showDatePicker}

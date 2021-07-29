@@ -3,15 +3,16 @@ import {Text, View, TextInput as NativeInput, Keyboard, Pressable} from 'react-n
 import styles from 'styles/styles'
 import colors from '../../styles/colors'
 
-const TextInputContainer = ({label, icon, reverse = false, error, children}) => {
+const TextInputContainer = ({label, icon, reverse = false, error, editable = true, containerStyle, children}) => {
   return (
-    <View style={{marginVertical: 8}}>
+    <View style={[{marginVertical: 8}, containerStyle]}>
       <Text style={styles.textInputLabel}>{label}</Text>
       <View
         style={[
           {flexDirection: reverse ? 'row-reverse' : 'row'},
           styles.textInputContainer,
           error ? {borderColor: colors.error} : {},
+          editable ? {} : {borderColor: colors.gray200, backgroundColor: colors.gray100},
         ]}
       >
         {icon}
@@ -21,15 +22,15 @@ const TextInputContainer = ({label, icon, reverse = false, error, children}) => 
   )
 }
 
-const TextInput = ({clickable, ...props}) => {
+const TextInput = ({clickable, inputStyle, ...props}) => {
   return (
     <TextInputContainer {...props}>
       {clickable ? (
         <Pressable style={[styles.textInput, {justifyContent: 'center'}]} onBlur={Keyboard.dismiss} {...props}>
-          <Text style={[styles.textInputLabel, {fontSize: 18, color: '#475569'}]}>{props.value}</Text>
+          <Text style={[styles.textInputLabel, {fontSize: 18, color: colors.gray600}]}>{props.value}</Text>
         </Pressable>
       ) : (
-        <NativeInput style={styles.textInput} onBlur={Keyboard.dismiss} {...props} />
+        <NativeInput style={[styles.textInput, inputStyle]} onBlur={Keyboard.dismiss} {...props} />
       )}
     </TextInputContainer>
   )

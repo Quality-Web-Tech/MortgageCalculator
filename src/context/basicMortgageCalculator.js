@@ -1,11 +1,13 @@
 import React, {createContext, useReducer, useContext} from 'react'
 import isValidNumber from '../utils/isValidNumber'
+import calculateMortgage from '../utils/calculateBasicMortgage'
+
 const BasicMortgageCalculator = createContext()
 
 const basicMortgageCalculatorForm = {
   mortgageAmount: '100000',
   loanTerm: 30,
-  interest: '5.00',
+  interest: '2.00',
   startDate: new Date(),
   error: {
     mortgageAmount: false,
@@ -21,6 +23,7 @@ function BasicMortgageCalculatorProvider(props) {
           if (action.field === 'startDate' || action.field === 'loanTerm')
             return {...state, basic: {...state.basic, [action.field]: action.data}}
 
+          action.data = action.data.replace(/\,/g, '') // remove comma from formatted data
           if (!isValidNumber(action.data))
             return {
               ...state,
@@ -31,6 +34,10 @@ function BasicMortgageCalculatorProvider(props) {
             ...state,
             basic: {...state.basic, [action.field]: action.data, error: {...state.basic.error, [action.field]: false}},
           }
+        }
+
+        case 'UPDATE_BASIC_CALCULATION': {
+          return {...state, basic: calculateMortgage(state.basic)}
         }
 
         default: {
@@ -55,5 +62,6 @@ function useBasicMortgageCalculator() {
 }
 
 const updateBasicForm = (field, data, dispatch) => dispatch({type: 'UPDATE_BASIC_FORM', field, data})
+const updateBasicCalculation = dispatch => dispatch({type: 'UPDATE_BASIC_CALCULATION'})
 
-export {BasicMortgageCalculatorProvider, useBasicMortgageCalculator, updateBasicForm}
+export {BasicMortgageCalculatorProvider, useBasicMortgageCalculator, updateBasicForm, updateBasicCalculation}

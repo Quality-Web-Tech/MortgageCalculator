@@ -4,6 +4,7 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import colors from 'styles/colors'
 import fontFamily from 'styles/fontFamily'
 import Home from 'screens/Home'
+import Detail from 'screens/Detail'
 
 const Tab = createMaterialTopTabNavigator()
 
@@ -39,7 +40,7 @@ const TopTabNavigator = ({navigation, route}) => {
       }}
     >
       <Tab.Screen name="INPUT" component={Home} />
-      <Tab.Screen name="DETAIL" component={Tester} />
+      <Tab.Screen name="DETAIL" component={Detail} />
       <Tab.Screen name="TABLE" component={Tester} />
       <Tab.Screen name="CHART" component={Tester} />
     </Tab.Navigator>
