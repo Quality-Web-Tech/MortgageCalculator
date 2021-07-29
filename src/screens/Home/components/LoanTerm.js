@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React from 'react'
 import {Text, View} from 'react-native'
 import fontFamily from 'styles/fontFamily'
 import colors from 'styles/colors'
@@ -18,11 +18,9 @@ const Label = ({label}) => (
   </Text>
 )
 
-const LoanTerm = ({leftLabel, rightLabel}) => {
-  const [selected, setSelected] = useState(20)
-
+const LoanTerm = ({leftLabel, rightLabel, loanTerm, onChangeTerm}) => {
   const selectYearTerm = year => {
-    setSelected(year)
+    onChangeTerm(year)
   }
   return (
     <View style={{marginVertical: 8}}>
@@ -32,7 +30,7 @@ const LoanTerm = ({leftLabel, rightLabel}) => {
       </View>
       <View style={{marginVertical: 8, flexDirection: 'row', justifyContent: 'space-between'}}>
         {terms.map(year => (
-          <Button key={year} label={year} active={year === selected} onPress={() => selectYearTerm(year)} />
+          <Button key={year} label={year} active={year === loanTerm} onPress={() => selectYearTerm(year)} />
         ))}
       </View>
     </View>

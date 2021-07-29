@@ -30,4 +30,30 @@ export default {
     fontSize: variables.fontSizeMedium,
     marginLeft: 16,
   },
+
+  textInputContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 60,
+    marginVertical: 8,
+    borderWidth: 1,
+    borderColor: themeColors.borderActive,
+    borderRadius: 8,
+    padding: 16,
+  },
+
+  textInput: {
+    flex: 1,
+    height: 30,
+    marginLeft: 4,
+    fontSize: variables.fontSizeMedium,
+    fontFamily: fontFamily.MONTSERRAT_REGULAR,
+    color: colors.gray600,
+  },
+
+  textInputLabel: {
+    fontFamily: fontFamily.MONTSERRAT_REGULAR,
+    fontSize: 14,
+    color: colors.gray500,
+  },
 }

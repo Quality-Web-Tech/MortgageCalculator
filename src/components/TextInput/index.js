@@ -1,50 +1,30 @@
 import React from 'react'
-import {Text, View, TextInput as NativeInput, Keyboard} from 'react-native'
-import fontFamily from 'styles/fontFamily'
-import colors from 'styles/colors'
-import themes from 'styles/themes'
-import variables from 'styles/variables'
+import {Text, View, TextInput as NativeInput, Keyboard, Pressable} from 'react-native'
+import styles from 'styles/styles'
 
-const TextInput = ({label, icon, reverse = false, ...props}) => {
+const TextInputContainer = ({label, icon, reverse = false, children}) => {
   return (
     <View style={{marginVertical: 8}}>
-      <Text
-        style={{
-          fontFamily: fontFamily.MONTSERRAT_REGULAR,
-          fontSize: 14,
-          color: colors.gray500,
-        }}
-      >
-        {label}
-      </Text>
-      <View
-        style={{
-          flexDirection: reverse ? 'row-reverse' : 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: 60,
-          marginVertical: 8,
-          borderWidth: 1,
-          borderColor: themes.borderActive,
-          borderRadius: 8,
-          padding: 16,
-        }}
-      >
+      <Text style={styles.textInputLabel}>{label}</Text>
+      <View style={[{flexDirection: reverse ? 'row-reverse' : 'row'}, styles.textInputContainer]}>
         {icon}
-        <NativeInput
-          style={{
-            flex: 1,
-            height: 30,
-            marginLeft: 4,
-            fontSize: variables.fontSizeMedium,
-            fontFamily: fontFamily.MONTSERRAT_REGULAR,
-            color: colors.gray600,
-          }}
-          onBlur={Keyboard.dismiss}
-          {...props}
-        />
+        {children}
       </View>
     </View>
+  )
+}
+
+const TextInput = ({clickable, ...props}) => {
+  return (
+    <TextInputContainer {...props}>
+      {clickable ? (
+        <Pressable style={[styles.textInput, {justifyContent: 'center'}]} onBlur={Keyboard.dismiss} {...props}>
+          <Text style={[styles.textInputLabel, {fontSize: 18, color: '#475569'}]}>{props.value}</Text>
+        </Pressable>
+      ) : (
+        <NativeInput style={styles.textInput} onBlur={Keyboard.dismiss} {...props} />
+      )}
+    </TextInputContainer>
   )
 }
 
