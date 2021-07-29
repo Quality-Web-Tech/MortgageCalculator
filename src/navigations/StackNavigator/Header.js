@@ -1,9 +1,8 @@
 import React from 'react'
 import {View, Text} from 'react-native'
-import {useNavigation, DrawerActions} from '@react-navigation/native'
+import {useNavigation} from '@react-navigation/native'
 import {MenuBar} from 'components'
 import styles from 'styles/styles'
-import colors from 'styles/colors'
 
 const Header = () => {
   const navigation = useNavigation()

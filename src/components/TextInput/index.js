@@ -1,11 +1,11 @@
 import React from 'react'
-import {Text, View, TextInput as NativeInput} from 'react-native'
+import {Text, View, TextInput as NativeInput, Keyboard} from 'react-native'
 import fontFamily from 'styles/fontFamily'
 import colors from 'styles/colors'
 import themes from 'styles/themes'
 import variables from 'styles/variables'
 
-const TextInput = ({label, icon, reverse = false}) => {
+const TextInput = ({label, icon, reverse = false, ...props}) => {
   return (
     <View style={{marginVertical: 8}}>
       <Text
@@ -40,6 +40,8 @@ const TextInput = ({label, icon, reverse = false}) => {
             fontFamily: fontFamily.MONTSERRAT_REGULAR,
             color: colors.gray600,
           }}
+          onBlur={Keyboard.dismiss}
+          {...props}
         />
       </View>
     </View>

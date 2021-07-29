@@ -1,14 +1,10 @@
 import React from 'react'
 import {View} from 'react-native'
-import ScreenWrapper from '../ScreenWrapper'
-import styles from '/styles/styles'
+import colors from 'styles/colors'
+import styles from 'styles/styles'
 
 const Container = ({style = {}, ...props}) => {
-  return (
-    <ScreenWrapper>
-      <View style={[styles.p3, styles.flex1, style]} {...props} />
-    </ScreenWrapper>
-  )
+  return <View style={[styles.p4, styles.flex1, {backgroundColor: colors.white}, style]} {...props} />
 }
 
 export default Container

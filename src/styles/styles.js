@@ -21,7 +21,7 @@ export default {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    ...spacing.p3,
+    paddingHorizontal: 16,
   },
 
   headerTitle: {

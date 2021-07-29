@@ -9,7 +9,7 @@ export default {
     margin: 0,
   },
 
-  p3: {
-    paddingHorizontal: 16,
+  p4: {
+    padding: 16,
   },
 }

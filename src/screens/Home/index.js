@@ -1,18 +1,20 @@
 import React from 'react'
-import {View} from 'react-native'
 import colors from 'styles/colors'
 import {MaterialIcons, FontAwesome5} from '@expo/vector-icons'
 import variables from 'styles/variables'
-import {TextInput} from 'components'
+import {Container, TextInput} from 'components'
+import LoanLength from './components/LoanLength'
 
 export default function Home() {
   return (
-    <View style={{padding: 16, flex: 1}}>
+    <Container>
       <TextInput
         label="Mortgage Amount"
         icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
+        onChangeText={a => console.log(a)}
       />
 
+      <LoanLength leftLabel="Length of Loan" rightLabel="Years" />
       <TextInput
         reverse
         label="Interest Rate"
@@ -23,7 +25,8 @@ export default function Home() {
         reverse
         label="Start Date"
         icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
+        onChangeText={a => console.log(a)}
       />
-    </View>
+    </Container>
   )
 }
