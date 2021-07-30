@@ -5,6 +5,7 @@ import colors from 'styles/colors'
 import fontFamily from 'styles/fontFamily'
 import Home from 'screens/Home'
 import Detail from 'screens/Detail'
+import Table from 'screens/Table'
 
 const Tab = createMaterialTopTabNavigator()
 
@@ -14,7 +15,7 @@ const Tester = () => (
   </View>
 )
 
-const TopTabNavigator = ({navigation, route}) => {
+const TopTabNavigator = () => {
   return (
     <Tab.Navigator
       lazy
@@ -41,7 +42,7 @@ const TopTabNavigator = ({navigation, route}) => {
     >
       <Tab.Screen name="INPUT" component={Home} />
       <Tab.Screen name="DETAIL" component={Detail} />
-      <Tab.Screen name="TABLE" component={Tester} />
+      <Tab.Screen name="TABLE" component={Table} />
       <Tab.Screen name="CHART" component={Tester} />
     </Tab.Navigator>
   )

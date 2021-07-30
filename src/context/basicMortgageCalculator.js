@@ -1,6 +1,7 @@
 import React, {createContext, useReducer, useContext} from 'react'
 import isValidNumber from '../utils/isValidNumber'
 import calculateMortgage from '../utils/calculateBasicMortgage'
+import calculateMonthlyYearlyPayment from '../utils/calculateMonthlyYearlyPayment'
 
 const BasicMortgageCalculator = createContext()
 
@@ -40,6 +41,10 @@ function BasicMortgageCalculatorProvider(props) {
           return {...state, basic: calculateMortgage(state.basic)}
         }
 
+        case 'UPDATE_TABLE_CALCULATION': {
+          return {...state, basic: calculateMonthlyYearlyPayment(state.basic)}
+        }
+
         default: {
           throw new Error(`Unhandled action type: ${action.type}`)
         }
@@ -63,5 +68,12 @@ function useBasicMortgageCalculator() {
 
 const updateBasicForm = (field, data, dispatch) => dispatch({type: 'UPDATE_BASIC_FORM', field, data})
 const updateBasicCalculation = dispatch => dispatch({type: 'UPDATE_BASIC_CALCULATION'})
+const updateTableCalculation = dispatch => dispatch({type: 'UPDATE_TABLE_CALCULATION'})
 
-export {BasicMortgageCalculatorProvider, useBasicMortgageCalculator, updateBasicForm, updateBasicCalculation}
+export {
+  BasicMortgageCalculatorProvider,
+  useBasicMortgageCalculator,
+  updateBasicForm,
+  updateBasicCalculation,
+  updateTableCalculation,
+}
