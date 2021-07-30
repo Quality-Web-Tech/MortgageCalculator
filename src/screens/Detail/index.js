@@ -7,9 +7,9 @@ import {Container, TextInput} from 'components'
 import {useBasicMortgageCalculator} from 'context/basicMortgageCalculator'
 import {formatDate, formatNumber} from 'utils/formatter'
 
-export default function Home() {
+export default function Detail() {
   const [{basic}] = useBasicMortgageCalculator()
-  const {mortgageAmount, loanTerm, interest, startDate, endDate, monthlyPayment, totalPayment, totalInterest} = basic
+  const {mortgageAmount, loanTerm, startDate, endDate, monthlyPayment, totalPayment, totalInterest} = basic
 
   return (
     <Container>
@@ -26,6 +26,8 @@ export default function Home() {
         value={formatNumber(monthlyPayment)}
         icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
       />
+
+      <TextInput label="Number Of Payments" editable={false} value={formatNumber(loanTerm * 12)} />
 
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
         <TextInput
