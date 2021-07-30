@@ -6,14 +6,9 @@ import fontFamily from 'styles/fontFamily'
 import Home from 'screens/Home'
 import Detail from 'screens/Detail'
 import Table from 'screens/Table'
+import Chart from 'screens/Chart'
 
 const Tab = createMaterialTopTabNavigator()
-
-const Tester = () => (
-  <View>
-    <Text>Tester</Text>
-  </View>
-)
 
 const TopTabNavigator = () => {
   return (
@@ -40,10 +35,10 @@ const TopTabNavigator = () => {
         },
       }}
     >
-      <Tab.Screen name="INPUT" component={Home} />
+      <Tab.Screen name="INPUT" component={Chart} />
       <Tab.Screen name="DETAIL" component={Detail} />
       <Tab.Screen name="TABLE" component={Table} />
-      <Tab.Screen name="CHART" component={Tester} />
+      <Tab.Screen name="CHART" component={Chart} />
     </Tab.Navigator>
   )
 }
