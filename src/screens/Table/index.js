@@ -14,7 +14,7 @@ export default function Home() {
     const {label, interest, principal, total, balance} = data
     return (
       <View style={styles.listItemTableContainer}>
-        <Text style={[styles.listItemTable, term === 'year' ? {width: 45} : {width: 75}]}>{label}</Text>
+        <Text style={[styles.listItemTable, term === 'year' ? {width: 50} : {width: 75}]}>{label}</Text>
         <Text style={[styles.listItemTable, {flex: 1}]}>${formatNumber(interest)}</Text>
         <Text style={[styles.listItemTable, {flex: 1}]}>${formatNumber(principal)}</Text>
         <Text style={[styles.listItemTable, {flex: 1}]}>${formatNumber(total)}</Text>
@@ -25,7 +25,7 @@ export default function Home() {
 
   const ListHeader = () => (
     <View style={[styles.listTableHeaderContainer]}>
-      <Text style={[styles.listTableHeader, term === 'year' ? {width: 45} : {width: 75}]}>
+      <Text style={[styles.listTableHeader, term === 'year' ? {width: 50} : {width: 75}]}>
         {term === 'year' ? 'Year' : 'Month'}
       </Text>
       <Text style={[styles.listTableHeader, {flex: 1}]}>INTEREST</Text>
@@ -37,7 +37,6 @@ export default function Home() {
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log('rerender inside Table2 ')
       updateTableCalculation(dispatch)
     }, []),
   )
