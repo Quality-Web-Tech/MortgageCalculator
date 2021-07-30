@@ -81,4 +81,41 @@ export default {
     flexDirection: 'row',
     paddingBottom: 6,
   },
+
+  chartLabelHeader: {
+    position: 'absolute',
+    fontSize: 13,
+    fontFamily: fontFamily.MONTSERRAT_BOLD,
+    color: colors.gray600,
+  },
+
+  chartTotal: {
+    position: 'absolute',
+    fontSize: 14,
+    fontFamily: fontFamily.MONTSERRAT_SEMIBOLD,
+    color: colors.gray600,
+  },
+
+  chartExpenseContainer: {
+    flex: 1,
+    marginBottom: 16,
+    marginLeft: 16,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.gray300,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+
+  chartExpenseLabel: {
+    fontSize: 14,
+    color: colors.gray600,
+    fontFamily: fontFamily.MONTSERRAT_BOLD,
+  },
+
+  chartExpenseTotal: {
+    fontSize: 16,
+    color: colors.gray600,
+    fontFamily: fontFamily.MONTSERRAT_REGULAR,
+  },
 }

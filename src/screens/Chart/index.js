@@ -1,54 +1,66 @@
-import React, {useState, useRef, useEffect, useLayoutEffect} from 'react'
-import {Text, Dimensions} from 'react-native'
-import colors from 'styles/colors'
-import {MaterialIcons} from '@expo/vector-icons'
-import variables from 'styles/variables'
-import fontFamily from 'styles/fontFamily'
-import {Container, TextInput} from 'components'
+import React, {useState} from 'react'
+import {Text, View, FlatList} from 'react-native'
+import styles from 'styles/styles'
+import {Container} from 'components'
 import {useBasicMortgageCalculator} from 'context/basicMortgageCalculator'
-import {formatDate, formatNumber} from 'utils/formatter'
+import {formatNumber} from 'utils/formatter'
 import {PieChart} from 'react-native-svg-charts'
 
-// Re calculate if PieChart position has changed!!
-const pieInfo = {
-  height: 198.04444885253906,
-  width: 349.8666687011719,
+const ListItem = ({data}) => {
+  const {label, total, percent, icon} = data
+  return (
+    <View style={{flexDirection: 'row'}}>
+      {icon}
+      <View style={styles.chartExpenseContainer}>
+        <Text style={styles.chartExpenseLabel}>{`${label} (${percent}%)`}</Text>
+        <Text style={styles.chartExpenseTotal}>${formatNumber(total)}</Text>
+      </View>
+    </View>
+  )
 }
 
 export default function Chart() {
-  const deviceWidth = Dimensions.get('window').width
+  const [{basic}] = useBasicMortgageCalculator()
+  const {interestPrincipalPercentage: data, totalPayment} = basic
 
-  const data = [50, 30, 15, 20]
-
-  const randomColor = () => ('#' + ((Math.random() * 0xffffff) << 0).toString(16) + '000000').slice(0, 7)
+  const [pieLayout, setPieLayout] = useState()
 
   const pieData = data.map((value, index) => ({
-    value,
-
+    value: value.percent,
     svg: {
-      fill: randomColor(),
-      onPress: () => console.log('press', index),
+      fill: value.color,
     },
     key: `pie-${index}`,
+    // onPress: () => console.log('press', index), // can be used to update center pie charge labels
   }))
+
+  const renderItem = ({item}) => <ListItem data={item} />
 
   return (
     <Container>
-      <PieChart innerRadius="52%" style={{height: 200, marginTop: 10}} data={pieData} padAngle={0.02} />
-      {pieInfo && (
-        <Text
-          style={{
-            position: 'absolute',
-            left: pieInfo.width / 2 - 7,
-            top: pieInfo.height / 2 + 8,
-            fontSize: 12,
-            fontFamily: fontFamily.MONTSERRAT_BOLD,
-            color: colors.gray600,
-          }}
-        >
-          Mortgage Cost
-        </Text>
-      )}
+      <View
+        onLayout={e => {
+          setPieLayout(e.nativeEvent.layout)
+        }}
+        style={{marginTop: 10, justifyContent: 'center', alignItems: 'center'}}
+      >
+        <PieChart innerRadius="55%" style={{height: 200, width: '100%'}} data={pieData} padAngle={0.02} />
+
+        {pieLayout && (
+          <>
+            <Text style={[{top: pieLayout.height / 2 - 20}, styles.chartLabelHeader]}>Mortgage Cost</Text>
+            <Text style={[styles.chartTotal, {top: pieLayout.height / 2 + 3}]}>${formatNumber(totalPayment)}</Text>
+          </>
+        )}
+      </View>
+
+      <FlatList
+        style={{marginTop: 60}}
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={item => item.label}
+        horizontal={false}
+      />
     </Container>
   )
 }

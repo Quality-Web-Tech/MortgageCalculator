@@ -1,5 +1,4 @@
 import React from 'react'
-import {View, Text} from 'react-native'
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs'
 import colors from 'styles/colors'
 import fontFamily from 'styles/fontFamily'
@@ -35,7 +34,7 @@ const TopTabNavigator = () => {
         },
       }}
     >
-      <Tab.Screen name="INPUT" component={Chart} />
+      <Tab.Screen name="INPUT" component={Home} />
       <Tab.Screen name="DETAIL" component={Detail} />
       <Tab.Screen name="TABLE" component={Table} />
       <Tab.Screen name="CHART" component={Chart} />
