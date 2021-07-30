@@ -56,4 +56,29 @@ export default {
     fontSize: 14,
     color: colors.gray500,
   },
+
+  listTableHeaderContainer: {
+    paddingTop: 26,
+    paddingBottom: 12,
+    flexDirection: 'row',
+  },
+
+  listTableHeader: {
+    flex: 1,
+    fontSize: 12,
+    fontFamily: fontFamily.MONTSERRAT_SEMIBOLD,
+    color: colors.gray600,
+  },
+
+  listItemTable: {
+    flex: 1,
+    fontSize: 12,
+    fontFamily: fontFamily.MONTSERRAT_REGULAR,
+    color: colors.gray600,
+  },
+
+  listItemTableContainer: {
+    flexDirection: 'row',
+    paddingBottom: 6,
+  },
 }
