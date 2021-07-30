@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
-import {Text, View, FlatList} from 'react-native'
+import {Text, View} from 'react-native'
 import styles from 'styles/styles'
-import {Container} from 'components'
+import {Container, FlatList} from 'components'
 import {useBasicMortgageCalculator} from 'context/basicMortgageCalculator'
 import {formatNumber} from 'utils/formatter'
 import {PieChart} from 'react-native-svg-charts'
@@ -34,8 +34,6 @@ export default function Chart() {
     // onPress: () => console.log('press', index), // can be used to update center pie charge labels
   }))
 
-  const renderItem = ({item}) => <ListItem data={item} />
-
   return (
     <Container>
       <View
@@ -54,13 +52,7 @@ export default function Chart() {
         )}
       </View>
 
-      <FlatList
-        style={{marginTop: 60}}
-        data={data}
-        renderItem={renderItem}
-        keyExtractor={item => item.label}
-        horizontal={false}
-      />
+      <FlatList ListItem={ListItem} style={{marginTop: 60}} data={data} keyExtractor={item => item.label} />
     </Container>
   )
 }

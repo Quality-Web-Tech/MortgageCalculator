@@ -1,7 +1,7 @@
 import React from 'react'
-import {View, Text, FlatList} from 'react-native'
+import {View, Text} from 'react-native'
 import styles from '../../styles/styles'
-import {Container, Picker} from 'components'
+import {Container, Picker, FlatList} from 'components'
 import {useBasicMortgageCalculator, updateTableCalculation} from 'context/basicMortgageCalculator'
 import {formatNumber} from 'utils/formatter'
 import {useFocusEffect} from '@react-navigation/native'
@@ -33,8 +33,6 @@ export default function Home() {
   const [{basic}, dispatch] = useBasicMortgageCalculator()
   const [term, setTerm] = React.useState('year')
 
-  const renderItem = ({item}) => <ListItem data={item} />
-
   useFocusEffect(
     React.useCallback(() => {
       console.log('rerender inside Table2 ')
@@ -46,8 +44,8 @@ export default function Home() {
     <Container>
       <Picker value={term} onChange={setTerm} />
       <FlatList
+        ListItem={ListItem}
         data={basic[term]}
-        renderItem={renderItem}
         keyExtractor={item => item.label}
         ListHeaderComponent={ListHeader}
         horizontal={false}
