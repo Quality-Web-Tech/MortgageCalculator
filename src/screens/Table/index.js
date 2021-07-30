@@ -6,32 +6,34 @@ import {useBasicMortgageCalculator, updateTableCalculation} from 'context/basicM
 import {formatNumber} from 'utils/formatter'
 import {useFocusEffect} from '@react-navigation/native'
 
-const ListItem = ({data}) => {
-  const {label, interest, principal, total, balance} = data
-  return (
-    <View style={styles.listItemTableContainer}>
-      <Text style={styles.listItemTable}>{label}</Text>
-      <Text style={styles.listItemTable}>${formatNumber(interest)}</Text>
-      <Text style={styles.listItemTable}>${formatNumber(principal)}</Text>
-      <Text style={styles.listItemTable}>${formatNumber(total)}</Text>
-      <Text style={styles.listItemTable}>${formatNumber(balance)}</Text>
-    </View>
-  )
-}
-
-const ListHeader = () => (
-  <View style={styles.listTableHeaderContainer}>
-    <Text style={styles.listTableHeader}>YEAR</Text>
-    <Text style={styles.listTableHeader}>INTEREST</Text>
-    <Text style={styles.listTableHeader}>PRINCIPAL</Text>
-    <Text style={styles.listTableHeader}>TOTAL</Text>
-    <Text style={styles.listTableHeader}>BALANCE</Text>
-  </View>
-)
-
 export default function Home() {
   const [{basic}, dispatch] = useBasicMortgageCalculator()
   const [term, setTerm] = React.useState('year')
+
+  const ListItem = ({data}) => {
+    const {label, interest, principal, total, balance} = data
+    return (
+      <View style={styles.listItemTableContainer}>
+        <Text style={[styles.listItemTable, term === 'year' ? {width: 45} : {width: 75}]}>{label}</Text>
+        <Text style={[styles.listItemTable, {flex: 1}]}>${formatNumber(interest)}</Text>
+        <Text style={[styles.listItemTable, {flex: 1}]}>${formatNumber(principal)}</Text>
+        <Text style={[styles.listItemTable, {flex: 1}]}>${formatNumber(total)}</Text>
+        <Text style={[styles.listItemTable, {flex: 1}]}>${formatNumber(balance)}</Text>
+      </View>
+    )
+  }
+
+  const ListHeader = () => (
+    <View style={[styles.listTableHeaderContainer]}>
+      <Text style={[styles.listTableHeader, term === 'year' ? {width: 45} : {width: 75}]}>
+        {term === 'year' ? 'Year' : 'Month'}
+      </Text>
+      <Text style={[styles.listTableHeader, {flex: 1}]}>INTEREST</Text>
+      <Text style={[styles.listTableHeader, {flex: 1}]}>PRINCIPAL</Text>
+      <Text style={[styles.listTableHeader, {flex: 1}]}>TOTAL</Text>
+      <Text style={[styles.listTableHeader, {flex: 1}]}>BALANCE</Text>
+    </View>
+  )
 
   useFocusEffect(
     React.useCallback(() => {

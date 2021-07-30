@@ -64,15 +64,13 @@ export default {
   },
 
   listTableHeader: {
-    flex: 1,
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: fontFamily.MONTSERRAT_SEMIBOLD,
     color: colors.gray600,
   },
 
   listItemTable: {
-    flex: 1,
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: fontFamily.MONTSERRAT_REGULAR,
     color: colors.gray600,
   },
