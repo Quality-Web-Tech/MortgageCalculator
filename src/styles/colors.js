@@ -9,8 +9,10 @@ export default {
   gray600: '#475569',
   teal: '#2DD4BF',
   cyan: '#22D3EE',
-  green: '#4ADE80',
+  green: '#16A34A',
+  lime: '#65A30D',
   violet: '#A78BFA',
+  orange: '#FB923C',
   transparent: 'transparent',
   error: '#DC2626',
 }

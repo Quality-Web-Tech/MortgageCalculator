@@ -1,6 +1,6 @@
 import React from 'react'
-import moment from 'moment'
 import {FontAwesome5, MaterialCommunityIcons} from '@expo/vector-icons'
+import colors from '../styles/colors'
 
 // P[r(1+r)^n/((1+r)^n)-1)]
 // p - principle
@@ -28,22 +28,20 @@ export default data => {
 
   const principalPercent = calcPercentage(totalPayment, principal)
   const interestPercent = calcPercentage(totalPayment, totalInterest)
-  const color1 = randomColor()
-  const color2 = randomColor()
 
   interestPrincipalPercentage.push({
     label: `Principal`,
     percent: principalPercent,
     total: principal,
-    icon: <FontAwesome5 name="wallet" color={color1} size={18} />,
-    color: color1,
+    icon: <FontAwesome5 name="wallet" color={colors.green} size={18} />,
+    color: colors.green,
   })
   interestPrincipalPercentage.push({
     label: `Interest`,
     percent: interestPercent,
     total: totalInterest,
-    icon: <MaterialCommunityIcons name="percent" color={color2} size={18} />,
-    color: color2,
+    icon: <MaterialCommunityIcons name="percent" color={colors.orange} size={18} />,
+    color: colors.orange,
   })
 
   return {
