@@ -17,14 +17,15 @@ const preCalculateMonthlyPaymentRaw = data => {
 const newStateWithMonthlyPaymentRaw = (state, action) => {
   const newState = {
     ...state,
-    basic: {...state.basic, [action.field]: action.data, error: {...state.basic.error, [action.field]: true}},
+    basic: {...state.basic, [action.field]: action.data},
   }
 
   const monthlyPaymentRaw = preCalculateMonthlyPaymentRaw(newState.basic)
+
   return {...newState, basic: {...newState.basic, monthlyPaymentRaw}}
 }
 
-const INITIAL_STATE = {
+export const INITIAL_STATE = {
   mortgageAmount: '100000',
   loanTerm: 30,
   interest: '2.00',
@@ -46,18 +47,28 @@ function BasicMortgageCalculatorProvider(props) {
       switch (action.type) {
         case 'UPDATE_BASIC_FORM': {
           if (action.field === 'startDate' || action.field === 'loanTerm') {
-            const newState = {...state, basic: {...state.basic, [action.field]: action.data}}
-            const monthlyPaymentRaw = preCalculateMonthlyPaymentRaw(newState.basic)
-            return {...newState, basic: {...newState.basic, monthlyPaymentRaw}}
-          }
-
-          // check if input formatted string is a valid number
-          const formattedStr = action.data.replace(/\,/g, '') // remove comma from formatted data
-
-          if (!isValidNumber(formattedStr)) {
+            console.log('called startDate')
             return newStateWithMonthlyPaymentRaw(state, action)
           }
 
+          action.data = action.data.replace(/\,/g, '') // remove comma from formatted data
+          // if (action.field === 'mortgageAmount' || action.field === 'interest') {
+          //   // check if input formatted string is a valid number
+          //   const formattedStr = action.data.replace(/\,/g, '') // remove comma from formatted data
+
+          //   if (!isValidNumber(formattedStr)) {
+          //     return {
+          //       ...state,
+          //       basic: {
+          //         ...state.basic,
+          //         [action.field]: action.data,
+          //         error: {...state.basic.error, [action.field]: true},
+          //       },
+          //     }
+          //   }
+          // }
+
+          console.log('inside REDUVER', state, action)
           return newStateWithMonthlyPaymentRaw(state, action)
         }
 
