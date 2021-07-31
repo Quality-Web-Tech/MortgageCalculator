@@ -70,7 +70,7 @@ export default {
   },
 
   listItemTable: {
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: fontFamily.MONTSERRAT_REGULAR,
     color: colors.gray600,
   },
