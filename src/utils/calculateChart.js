@@ -22,9 +22,7 @@ export default data => {
   const n = loanTerm * 12 // months to be paid
   const interestPrincipalPercentage = []
 
-  const endDate = moment(startDate).add(loanTerm, 'years')
   const monthlyPaymentRaw = (p * r) / (1 - Math.pow(1 + r, n * -1))
-  const monthlyPayment = monthlyPaymentRaw.toFixed(2)
   const totalPayment = (monthlyPaymentRaw * n).toFixed(2)
   const totalInterest = (totalPayment - p).toFixed(2)
 
@@ -49,11 +47,7 @@ export default data => {
   })
 
   return {
-    ...data,
-    endDate,
-    monthlyPayment,
     totalPayment,
-    totalInterest,
     interestPrincipalPercentage,
   }
 }

@@ -5,6 +5,7 @@ import {Container, FlatList} from 'components'
 import {useBasicMortgageCalculator} from 'context/basicMortgageCalculator'
 import {formatNumber} from 'utils/formatter'
 import {PieChart} from 'react-native-svg-charts'
+import calculateChart from '../../utils/calculateChart'
 
 const ListItem = ({data}) => {
   const {label, total, percent, icon} = data
@@ -21,7 +22,7 @@ const ListItem = ({data}) => {
 
 export default function Chart() {
   const [{basic}] = useBasicMortgageCalculator()
-  const {interestPrincipalPercentage: data, totalPayment} = basic
+  const {interestPrincipalPercentage: data, totalPayment} = calculateChart(basic)
 
   const [pieLayout, setPieLayout] = useState()
 

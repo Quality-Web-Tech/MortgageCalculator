@@ -1,28 +1,47 @@
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
+const dataForMonth = (startMonth, currentYear, ip, mmip, balance) => {
+  return {
+    label: `${months[startMonth]}/${currentYear}`,
+    interest: ip.toFixed(2),
+    principal: mmip.toFixed(2),
+    total: (ip + mmip).toFixed(2),
+    balance: balance < 0 ? 0 : balance.toFixed(2),
+  }
+}
+const dataForYear = (currentYear, yearInterest, yearPrincipal, yearTotal, balance) => {
+  return {
+    label: currentYear.toString(),
+    interest: yearInterest.toFixed(2),
+    principal: yearPrincipal.toFixed(2),
+    total: yearTotal.toFixed(2),
+    balance: balance < 0 ? 0 : balance.toFixed(2),
+  }
+}
+
 const calcMonthlyAndYearly = data => {
   const copyData = {...data}
-
-  let {mortgageAmount: principal, interest, loanTerm, startDate, monthlyPayment} = copyData
+  let {mortgageAmount: principal, interest, loanTerm, startDate, monthlyPaymentRaw} = copyData
 
   let balance = Number(principal)
-  interest = Number(interest) / 1200 //monthly interest
+  interest /= 1200 // 12 months per year, monthly interest
+  let term = loanTerm * 12
+
   let startMonth = startDate.getMonth()
   let currentYear = startDate.getFullYear()
-  let term = loanTerm * 12
 
   let yearInterest = 0
   let yearPrincipal = 0
   let yearTotal = 0
 
-  const calculatedData = {
+  const tableData = {
     month: [],
     year: [],
   }
 
   while (startMonth < 12 && term > 0) {
     let ip = balance * interest
-    let mmip = monthlyPayment - ip
+    let mmip = monthlyPaymentRaw - ip
     balance = balance - mmip
 
     // accumulate yearly
@@ -31,37 +50,20 @@ const calcMonthlyAndYearly = data => {
     yearTotal += ip + mmip
 
     // accumulate monthly
-    calculatedData.month.push({
-      label: `${months[startMonth]}/${currentYear}`,
-      interest: ip.toFixed(2),
-      principal: mmip.toFixed(2),
-      total: (ip + mmip).toFixed(2),
-      balance: balance < 0 ? 0 : balance.toFixed(2),
-    })
+    tableData.month.push(dataForMonth(startMonth, currentYear, ip, mmip, balance))
 
     startMonth += 1
     term -= 1
 
     // Save data before exiting
     if (term === 0) {
-      calculatedData.year.push({
-        label: currentYear.toString(),
-        interest: yearInterest.toFixed(2),
-        principal: yearPrincipal.toFixed(2),
-        total: yearTotal.toFixed(2),
-        balance: balance < 0 ? 0 : balance.toFixed(2),
-      })
+      tableData.year.push(dataForYear(currentYear, yearInterest, yearPrincipal, yearTotal, balance))
     }
 
     // Save monthly and yearly and reset variables
     if (startMonth === 12) {
-      calculatedData.year.push({
-        label: currentYear.toString(),
-        interest: yearInterest.toFixed(2),
-        principal: yearPrincipal.toFixed(2),
-        total: yearTotal.toFixed(2),
-        balance: balance.toFixed(2),
-      })
+      tableData.year.push(dataForYear(currentYear, yearInterest, yearPrincipal, yearTotal, balance))
+
       yearInterest = 0
       yearTotal = 0
       yearPrincipal = 0
@@ -71,8 +73,7 @@ const calcMonthlyAndYearly = data => {
   }
 
   return {
-    ...data,
-    ...calculatedData,
+    tableData: tableData,
   }
 }
 

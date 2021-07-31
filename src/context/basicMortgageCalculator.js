@@ -1,15 +1,39 @@
 import React, {createContext, useReducer, useContext} from 'react'
 import isValidNumber from '../utils/isValidNumber'
-import calculateMortgage from '../utils/calculateBasicMortgage'
-import calculateMonthlyYearlyPayment from '../utils/calculateMonthlyYearlyPayment'
 
 const BasicMortgageCalculator = createContext()
 
-const basicMortgageCalculatorForm = {
+const preCalculateMonthlyPaymentRaw = data => {
+  const copiedData = {...data}
+  let {mortgageAmount, interest, loanTerm} = copiedData
+
+  const p = Number(mortgageAmount)
+  const r = Number(interest) / 100 / 12 // 12 months per year, monthly interest
+  const n = loanTerm * 12 // months to be paid
+
+  return (p * r) / (1 - Math.pow(1 + r, n * -1))
+}
+
+const newStateWithMonthlyPaymentRaw = (state, action) => {
+  const newState = {
+    ...state,
+    basic: {...state.basic, [action.field]: action.data, error: {...state.basic.error, [action.field]: true}},
+  }
+
+  const monthlyPaymentRaw = preCalculateMonthlyPaymentRaw(newState.basic)
+  return {...newState, basic: {...newState.basic, monthlyPaymentRaw}}
+}
+
+const INITIAL_STATE = {
   mortgageAmount: '100000',
   loanTerm: 30,
   interest: '2.00',
   startDate: new Date(),
+  monthlyPaymentRaw: preCalculateMonthlyPaymentRaw({
+    mortgageAmount: '100000',
+    interest: '2.00',
+    loanTerm: 30,
+  }),
   error: {
     mortgageAmount: false,
     interest: false,
@@ -21,28 +45,20 @@ function BasicMortgageCalculatorProvider(props) {
     (state, action) => {
       switch (action.type) {
         case 'UPDATE_BASIC_FORM': {
-          if (action.field === 'startDate' || action.field === 'loanTerm')
-            return {...state, basic: {...state.basic, [action.field]: action.data}}
-
-          action.data = action.data.replace(/\,/g, '') // remove comma from formatted data
-          if (!isValidNumber(action.data))
-            return {
-              ...state,
-              basic: {...state.basic, [action.field]: action.data, error: {...state.basic.error, [action.field]: true}},
-            }
-
-          return {
-            ...state,
-            basic: {...state.basic, [action.field]: action.data, error: {...state.basic.error, [action.field]: false}},
+          if (action.field === 'startDate' || action.field === 'loanTerm') {
+            const newState = {...state, basic: {...state.basic, [action.field]: action.data}}
+            const monthlyPaymentRaw = preCalculateMonthlyPaymentRaw(newState.basic)
+            return {...newState, basic: {...newState.basic, monthlyPaymentRaw}}
           }
-        }
 
-        case 'UPDATE_BASIC_CALCULATION': {
-          return {...state, basic: calculateMortgage(state.basic)}
-        }
+          // check if input formatted string is a valid number
+          const formattedStr = action.data.replace(/\,/g, '') // remove comma from formatted data
 
-        case 'UPDATE_TABLE_CALCULATION': {
-          return {...state, basic: calculateMonthlyYearlyPayment(state.basic)}
+          if (!isValidNumber(formattedStr)) {
+            return newStateWithMonthlyPaymentRaw(state, action)
+          }
+
+          return newStateWithMonthlyPaymentRaw(state, action)
         }
 
         default: {
@@ -50,7 +66,7 @@ function BasicMortgageCalculatorProvider(props) {
         }
       }
     },
-    {basic: basicMortgageCalculatorForm},
+    {basic: INITIAL_STATE},
   )
 
   const value = [state, dispatch]
@@ -67,13 +83,5 @@ function useBasicMortgageCalculator() {
 }
 
 const updateBasicForm = (field, data, dispatch) => dispatch({type: 'UPDATE_BASIC_FORM', field, data})
-const updateBasicCalculation = dispatch => dispatch({type: 'UPDATE_BASIC_CALCULATION'})
-const updateTableCalculation = dispatch => dispatch({type: 'UPDATE_TABLE_CALCULATION'})
 
-export {
-  BasicMortgageCalculatorProvider,
-  useBasicMortgageCalculator,
-  updateBasicForm,
-  updateBasicCalculation,
-  updateTableCalculation,
-}
+export {BasicMortgageCalculatorProvider, useBasicMortgageCalculator, updateBasicForm}

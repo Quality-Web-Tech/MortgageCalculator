@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
 import {Keyboard} from 'react-native'
 import colors from 'styles/colors'
 import {MaterialIcons, FontAwesome5} from '@expo/vector-icons'
@@ -6,12 +6,10 @@ import variables from 'styles/variables'
 import {Container, TextInput} from 'components'
 import LoanTerm from './components/LoanTerm'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
-import {
-  useBasicMortgageCalculator,
-  updateBasicForm,
-  updateBasicCalculation,
-} from '../../context/basicMortgageCalculator'
+import {useBasicMortgageCalculator, updateBasicForm} from '../../context/basicMortgageCalculator'
 import {formatDate, formatNumber} from '../../utils/formatter'
+
+// use debounce on input
 
 export default function Home() {
   const [{basic}, dispatch] = useBasicMortgageCalculator()
@@ -30,14 +28,8 @@ export default function Home() {
   const handleConfirm = startDate => {
     Keyboard.dismiss()
     updateBasicForm('startDate', startDate, dispatch)
-
     hideDatePicker()
   }
-
-  // use useCallBack here
-  useEffect(() => {
-    updateBasicCalculation(dispatch)
-  }, [mortgageAmount, loanTerm, interest, startDate])
 
   return (
     <Container>
@@ -57,7 +49,7 @@ export default function Home() {
       />
       <TextInput
         reverse
-        value={basic.interest}
+        value={interest}
         label="Interest Rate"
         error={basic.error.interest}
         icon={<FontAwesome5 name="percent" size={variables.iconSizeExtraSmall} color={colors.gray400} />}

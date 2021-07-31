@@ -2,12 +2,14 @@ import React from 'react'
 import {View, Text} from 'react-native'
 import styles from '../../styles/styles'
 import {Container, Picker, FlatList} from 'components'
-import {useBasicMortgageCalculator, updateTableCalculation} from 'context/basicMortgageCalculator'
+import {useBasicMortgageCalculator} from 'context/basicMortgageCalculator'
 import {formatNumber} from 'utils/formatter'
-import {useFocusEffect} from '@react-navigation/native'
+import calculateMonthlyYearlyPayment from '../../utils/calculateMonthlyYearlyPayment'
 
 export default function Home() {
-  const [{basic}, dispatch] = useBasicMortgageCalculator()
+  const [{basic}] = useBasicMortgageCalculator()
+  const {tableData} = calculateMonthlyYearlyPayment(basic)
+
   const [term, setTerm] = React.useState('year')
 
   const ListItem = ({data}) => {
@@ -35,18 +37,12 @@ export default function Home() {
     </View>
   )
 
-  useFocusEffect(
-    React.useCallback(() => {
-      updateTableCalculation(dispatch)
-    }, []),
-  )
-
   return (
     <Container>
       <Picker value={term} onChange={setTerm} />
       <FlatList
         ListItem={ListItem}
-        data={basic[term]}
+        data={tableData[term]}
         keyExtractor={item => item.label}
         ListHeaderComponent={ListHeader}
         horizontal={false}
