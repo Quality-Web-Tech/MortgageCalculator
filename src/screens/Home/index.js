@@ -7,9 +7,10 @@ import {Container, TextInput} from 'components'
 import LoanTerm from './components/LoanTerm'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
 import {useBasicMortgageCalculator, updateBasicForm} from '../../context/basicMortgageCalculator'
-import {formatDate, formatNumber} from '../../utils/formatter'
+import {formatDate} from '../../utils/formatter'
 import {INITIAL_STATE} from '../../context/basicMortgageCalculator'
 import {debounce} from 'lodash/fp'
+import numbro from 'numbro'
 
 export default function Home() {
   const [, dispatch] = useBasicMortgageCalculator()
@@ -27,26 +28,33 @@ export default function Home() {
 
   const handleConfirm = startDate => {
     Keyboard.dismiss()
-    handleChange('startDate', startDate, dispatch)
+    handleChange('startDate', startDate)
     hideDatePicker()
   }
 
   const onChangeHandler = React.useCallback(
-    debounce(500, (...args) => updateBasicForm(...args)),
+    debounce(400, (...args) => updateBasicForm(...args)),
     [],
   )
 
   const handleChange = (label, value) => {
+    if (!value) {
+      console.log('called')
+      value = label === 'mortgageAmount' ? '0' : ''
+    }
+
     setInput({...input, [label]: value})
     onChangeHandler(label, value, dispatch)
   }
+
   return (
     <Container>
       <TextInput
         label="Mortgage Amount"
-        // onFocus={() => setInput({...input, mortgageAmount: ''})}
         error={input.error.mortgageAmount}
-        value={formatNumber(input.mortgageAmount)}
+        onFocus={() => handleChange('mortgageAmount', 0)}
+        keyboardType="decimal-pad"
+        value={numbro(input.mortgageAmount).format({thousandSeparated: true})}
         icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         onChangeText={mortgageAmount => handleChange('mortgageAmount', mortgageAmount)}
       />
@@ -55,15 +63,17 @@ export default function Home() {
         leftLabel="Length of Loan"
         rightLabel="Years"
         loanTerm={input.loanTerm}
-        onChangeTerm={loanTerm => handleChange('loanTerm', loanTerm, dispatch)}
+        onChangeTerm={loanTerm => handleChange('loanTerm', loanTerm)}
       />
       <TextInput
         reverse
         value={input.interest}
         label="Interest Rate"
         error={input.error.interest}
+        keyboardType="decimal-pad"
+        onFocus={() => handleChange('interest', '')}
         icon={<FontAwesome5 name="percent" size={variables.iconSizeExtraSmall} color={colors.gray400} />}
-        onChangeText={interest => handleChange('interest', interest, dispatch)}
+        onChangeText={interest => handleChange('interest', interest)}
       />
 
       <TextInput

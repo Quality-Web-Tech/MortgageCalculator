@@ -1,5 +1,4 @@
 import React, {createContext, useReducer, useContext} from 'react'
-import isValidNumber from '../utils/isValidNumber'
 
 const BasicMortgageCalculator = createContext()
 
@@ -47,28 +46,10 @@ function BasicMortgageCalculatorProvider(props) {
       switch (action.type) {
         case 'UPDATE_BASIC_FORM': {
           if (action.field === 'startDate' || action.field === 'loanTerm') {
-            console.log('called startDate')
             return newStateWithMonthlyPaymentRaw(state, action)
           }
 
-          action.data = action.data.replace(/\,/g, '') // remove comma from formatted data
-          // if (action.field === 'mortgageAmount' || action.field === 'interest') {
-          //   // check if input formatted string is a valid number
-          //   const formattedStr = action.data.replace(/\,/g, '') // remove comma from formatted data
-
-          //   if (!isValidNumber(formattedStr)) {
-          //     return {
-          //       ...state,
-          //       basic: {
-          //         ...state.basic,
-          //         [action.field]: action.data,
-          //         error: {...state.basic.error, [action.field]: true},
-          //       },
-          //     }
-          //   }
-          // }
-
-          console.log('inside REDUVER', state, action)
+          action.data = action.data.replace(/\,/g, '') // remove all comma
           return newStateWithMonthlyPaymentRaw(state, action)
         }
 

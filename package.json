@@ -23,6 +23,7 @@
     "install": "^0.13.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
+    "numbro": "^2.3.2",
     "prettier": "^2.3.2",
     "react": "16.13.1",
     "react-dom": "16.13.1",
