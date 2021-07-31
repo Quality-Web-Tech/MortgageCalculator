@@ -52,7 +52,6 @@ export default function Home() {
         <TextInput
           label="Mortgage Amount"
           error={input.error.mortgageAmount}
-          onFocus={() => handleChange('mortgageAmount', 0)}
           keyboardType="decimal-pad"
           value={numbro(input.mortgageAmount).format({thousandSeparated: true})}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
@@ -71,7 +70,6 @@ export default function Home() {
           label="Interest Rate"
           error={input.error.interest}
           keyboardType="decimal-pad"
-          onFocus={() => handleChange('interest', '')}
           icon={<FontAwesome5 name="percent" size={variables.iconSizeExtraSmall} color={colors.gray400} />}
           onChangeText={interest => handleChange('interest', interest)}
         />
