@@ -8,7 +8,7 @@ import {useBasicMortgageCalculator} from 'context/basicMortgageCalculator'
 import {formatDate, formatNumber} from 'utils/formatter'
 import calculateDetail from '../../utils/calculateDetail'
 
-export default function Detail() {
+function Detail() {
   const [{basic}] = useBasicMortgageCalculator()
   const {mortgageAmount, startDate, endDate, loanTerm, monthlyPayment, totalPayment, totalInterest} =
     calculateDetail(basic)
@@ -64,3 +64,5 @@ export default function Detail() {
     </Container>
   )
 }
+
+export default React.memo(Detail)

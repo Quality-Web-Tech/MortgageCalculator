@@ -7,7 +7,7 @@ import {formatNumber} from 'utils/formatter'
 import {PieChart} from 'react-native-svg-charts'
 import calculateChart from '../../utils/calculateChart'
 
-const ListItem = ({data}) => {
+function ListItem({data}) {
   const {label, total, percent, icon} = data
   return (
     <View style={{flexDirection: 'row'}}>
@@ -20,7 +20,9 @@ const ListItem = ({data}) => {
   )
 }
 
-export default function Chart() {
+ListItem = React.memo(ListItem)
+
+function Chart() {
   const [{basic}] = useBasicMortgageCalculator()
   const {interestPrincipalPercentage: data, totalPayment} = calculateChart(basic)
 
@@ -53,7 +55,14 @@ export default function Chart() {
         )}
       </View>
 
-      <FlatList ListItem={ListItem} style={{marginTop: 60}} data={data} keyExtractor={item => item.label} />
+      <FlatList
+        listItem={item => <ListItem data={item} />}
+        style={{marginTop: 60}}
+        data={data}
+        keyExtractor={item => item.label}
+      />
     </Container>
   )
 }
+
+export default React.memo(Chart)
