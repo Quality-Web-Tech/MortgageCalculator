@@ -1,5 +1,5 @@
 import React from 'react'
-import {View} from 'react-native'
+import {ScrollView, View} from 'react-native'
 import colors from 'styles/colors'
 import {MaterialIcons} from '@expo/vector-icons'
 import variables from 'styles/variables'
@@ -15,52 +15,54 @@ function Detail() {
 
   return (
     <Container>
-      <TextInput
-        label="Mortgage Amount"
-        editable={false}
-        value={formatNumber(mortgageAmount)}
-        icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
-      />
-
-      <TextInput
-        label="Monthly Payment"
-        editable={false}
-        value={formatNumber(monthlyPayment)}
-        icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
-      />
-
-      <TextInput label="Number Of Payments" editable={false} value={formatNumber(loanTerm)} />
-
-      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+      <ScrollView>
         <TextInput
-          containerStyle={{width: '45%'}}
-          inputStyle={{fontSize: 15}}
-          label="Start Date"
+          label="Mortgage Amount"
           editable={false}
-          value={formatDate(startDate)}
+          value={formatNumber(mortgageAmount)}
+          icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         />
+
         <TextInput
-          containerStyle={{width: '45%'}}
-          inputStyle={{fontSize: 15}}
-          label="Pay Off Date"
+          label="Monthly Payment"
           editable={false}
-          value={formatDate(endDate)}
+          value={formatNumber(monthlyPayment)}
+          icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         />
-      </View>
 
-      <TextInput
-        label="Total Interest Paid"
-        editable={false}
-        value={formatNumber(totalInterest)}
-        icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
-      />
+        <TextInput label="Number Of Payments" editable={false} value={formatNumber(loanTerm)} />
 
-      <TextInput
-        label="Total payment"
-        editable={false}
-        value={formatNumber(totalPayment)}
-        icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
-      />
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <TextInput
+            containerStyle={{width: '45%'}}
+            inputStyle={{fontSize: 15}}
+            label="Start Date"
+            editable={false}
+            value={formatDate(startDate)}
+          />
+          <TextInput
+            containerStyle={{width: '45%'}}
+            inputStyle={{fontSize: 15}}
+            label="Pay Off Date"
+            editable={false}
+            value={formatDate(endDate)}
+          />
+        </View>
+
+        <TextInput
+          label="Total Interest Paid"
+          editable={false}
+          value={formatNumber(totalInterest)}
+          icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
+        />
+
+        <TextInput
+          label="Total payment"
+          editable={false}
+          value={formatNumber(totalPayment)}
+          icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
+        />
+      </ScrollView>
     </Container>
   )
 }
