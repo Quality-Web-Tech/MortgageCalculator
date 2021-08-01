@@ -10,7 +10,7 @@ function ListHeader({term}) {
   return (
     <View style={[styles.listTableHeaderContainer]}>
       <Text style={[styles.listTableHeader, term === 'year' ? {width: 50} : {width: 75}]}>
-        {term === 'year' ? 'Year' : 'Month'}
+        {term === 'year' ? 'YEAR' : 'MONTH'}
       </Text>
       <Text style={[styles.listTableHeader, {flex: 1}]}>INTEREST</Text>
       <Text style={[styles.listTableHeader, {flex: 1}]}>PRINCIPAL</Text>
