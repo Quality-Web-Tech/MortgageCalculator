@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React from 'react'
 import {Text, Pressable} from 'react-native'
 import fontFamily from 'styles/fontFamily'
 import colors from 'styles/colors'
