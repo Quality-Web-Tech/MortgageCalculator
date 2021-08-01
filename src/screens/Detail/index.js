@@ -35,14 +35,14 @@ function Detail() {
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <TextInput
             containerStyle={{width: '45%'}}
-            inputStyle={{fontSize: 15}}
+            inputStyle={{fontSize: 12}}
             label="Start Date"
             editable={false}
             value={formatDate(startDate)}
           />
           <TextInput
             containerStyle={{width: '45%'}}
-            inputStyle={{fontSize: 15}}
+            inputStyle={{fontSize: 12}}
             label="Pay Off Date"
             editable={false}
             value={formatDate(endDate)}
