@@ -34,10 +34,6 @@ export const INITIAL_STATE = {
     interest: '2.00',
     loanTerm: 30,
   }),
-  error: {
-    mortgageAmount: false,
-    interest: false,
-  },
 }
 
 function BasicMortgageCalculatorProvider(props) {
