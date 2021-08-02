@@ -5,6 +5,7 @@ import {createDrawerNavigator} from '@react-navigation/drawer'
 import StackNavigator from './StackNavigator'
 import colors from '../styles/colors'
 import fontFamily from '../styles/fontFamily'
+import {getFocusedRouteNameFromRoute} from '@react-navigation/native'
 
 const Drawer = createDrawerNavigator()
 
@@ -13,7 +14,7 @@ const SideBar = ({navigation}) => {
     <ScreenWrapper>
       <Container>
         <Header
-          navigation={navigation}
+          onPress={() => navigation.closeDrawer()}
           iconName="md-arrow-back"
           iconColor="gray600"
           style={{
@@ -30,7 +31,7 @@ const SideBar = ({navigation}) => {
           }}
         />
         <View style={{marginTop: 42}}>
-          <TouchableOpacity style={{marginBottom: 16}}>
+          <TouchableOpacity style={{marginBottom: 16}} onPress={() => navigation.navigate('AdvanceHome')}>
             <Text style={{fontSize: 14, color: colors.gray600, fontFamily: fontFamily.MONTSERRAT_SEMIBOLD}}>
               Advance Mortgage Calculator
             </Text>
@@ -56,7 +57,14 @@ export const DrawerNavigator = () => {
         activeBackgroundColor: 'white',
       }}
     >
-      <Drawer.Screen name="Home" component={StackNavigator} options={{headerShown: false}} />
+      <Drawer.Screen
+        name="Home"
+        component={StackNavigator}
+        options={({route}) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? 'Home'
+          if (routeName == 'AdvanceHome') return {swipeEnabled: false}
+        }}
+      />
     </Drawer.Navigator>
   )
 }

@@ -13,7 +13,34 @@ export const StackNavigator = ({navigation}) => {
         name="Home"
         component={TopTabNavigator}
         options={{
-          headerTitle: () => <Header navigation={navigation} iconName="ios-menu" iconColor="white" />,
+          swipeEnabled: true,
+          headerTitle: () => <Header iconName="ios-menu" iconColor="white" onPress={() => navigation.toggleDrawer()} />,
+          headerStyle: {
+            backgroundColor: colors.gray600,
+            elevation: 0,
+            shadowOpacity: 0,
+          },
+          headerTitleContainerStyle: {
+            width: '100%',
+            left: 0,
+          },
+        }}
+      />
+
+      <Stack.Screen
+        name="AdvanceHome"
+        component={TopTabNavigator}
+        options={{
+          headerLeft: null,
+          gestureEnabled: false,
+          headerTitle: () => (
+            <Header
+              label="Advance Mortgage Calculator"
+              iconName="md-arrow-back"
+              iconColor="white"
+              onPress={() => navigation.goBack()}
+            />
+          ),
           headerStyle: {
             backgroundColor: colors.gray600,
             elevation: 0,
