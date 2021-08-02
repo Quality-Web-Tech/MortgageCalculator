@@ -84,7 +84,7 @@ function AdvanceMortgageCalculatorProvider(props) {
 
   const value = [state, dispatch]
 
-  return <AdvanceMortgageCalculatorProvider.Provider value={value} {...props} />
+  return <AdvanceMortgageCalculator.Provider value={value} {...props} />
 }
 
 function useAdvanceMortgageCalculator() {

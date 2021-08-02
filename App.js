@@ -6,6 +6,7 @@ import {ErrorBoundary} from '/components'
 import useFonts from 'hooks/useFonts'
 import RootNavigator from 'navigations/RootNavigator'
 import {BasicMortgageCalculatorProvider} from 'context/basicMortgageCalculator'
+import {AdvanceMortgageCalculatorProvider} from 'context/advanceMortgageCalculator'
 
 export default function App() {
   const [loaded] = useFonts()
@@ -17,9 +18,11 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <ErrorBoundary errorMessage="Mortgage Calculator crash caught by Error Boundary.">
-        <BasicMortgageCalculatorProvider>
-          <RootNavigator />
-        </BasicMortgageCalculatorProvider>
+        <AdvanceMortgageCalculatorProvider>
+          <BasicMortgageCalculatorProvider>
+            <RootNavigator />
+          </BasicMortgageCalculatorProvider>
+        </AdvanceMortgageCalculatorProvider>
       </ErrorBoundary>
     </SafeAreaProvider>
   )
