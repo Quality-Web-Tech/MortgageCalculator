@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {Keyboard, TouchableWithoutFeedback, View} from 'react-native'
+import {Keyboard, TouchableWithoutFeedback} from 'react-native'
 import colors from 'styles/colors'
 import {MaterialIcons, FontAwesome5} from '@expo/vector-icons'
 import variables from 'styles/variables'

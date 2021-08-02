@@ -1,8 +1,8 @@
 import React from 'react'
 import {createStackNavigator} from '@react-navigation/stack'
-import TopTabNavigator from '../TopTabsNavigator'
+import TopTabNavigator from './TopTabsNavigator'
 import colors from 'styles/colors'
-import {Header} from '../../components'
+import {Header} from '../components'
 
 const Stack = createStackNavigator()
 
