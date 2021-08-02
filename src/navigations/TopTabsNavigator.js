@@ -9,7 +9,7 @@ import Chart from 'screens/Chart'
 
 const Tab = createMaterialTopTabNavigator()
 
-const TopTabNavigator = () => {
+const TopTabNavigator = ({route}) => {
   return (
     <Tab.Navigator
       lazy
@@ -34,10 +34,34 @@ const TopTabNavigator = () => {
         },
       }}
     >
-      <Tab.Screen name="INPUT" component={Home} />
-      <Tab.Screen name="DETAIL" component={Detail} />
-      <Tab.Screen name="TABLE" component={Table} />
-      <Tab.Screen name="CHART" component={Chart} />
+      <Tab.Screen
+        name="INPUT"
+        component={Home}
+        initialParams={{
+          advanceMode: route.name === 'AdvanceHome',
+        }}
+      />
+      <Tab.Screen
+        name="DETAIL"
+        component={Detail}
+        initialParams={{
+          advanceMode: route.name === 'AdvanceHome',
+        }}
+      />
+      <Tab.Screen
+        name="TABLE"
+        component={Table}
+        initialParams={{
+          advanceMode: route.name === 'AdvanceHome',
+        }}
+      />
+      <Tab.Screen
+        name="CHART"
+        component={Chart}
+        initialParams={{
+          advanceMode: route.name === 'AdvanceHome',
+        }}
+      />
     </Tab.Navigator>
   )
 }
