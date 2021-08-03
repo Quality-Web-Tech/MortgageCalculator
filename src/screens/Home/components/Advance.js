@@ -6,7 +6,7 @@ import variables from 'styles/variables'
 import {Container, TextInput} from 'components'
 import LoanTerm from './LoanTerm'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
-import {useBasicMortgageCalculator, updateBasicForm} from '../../../context/basicMortgageCalculator'
+import {useAdvanceMortgageCalculator, updateAdvanceForm} from '../../../context/advanceMortgageCalculator'
 import {formatDate} from '../../../utils/formatter'
 import {INITIAL_STATE} from '../../../context/advanceMortgageCalculator'
 import {debounce} from 'lodash/fp'
@@ -16,7 +16,7 @@ import fontFamily from '../../../styles/fontFamily'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 
 export default function Home() {
-  const [, dispatch] = useBasicMortgageCalculator()
+  const [, dispatch] = useAdvanceMortgageCalculator()
 
   const [input, setInput] = useState(INITIAL_STATE)
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
@@ -55,13 +55,25 @@ export default function Home() {
   }
 
   const onChangeHandler = React.useCallback(
-    debounce(400, (...args) => updateBasicForm(...args)),
+    debounce(400, (...args) => updateAdvanceForm(...args)),
     [],
   )
 
   const handleChange = (label, value) => {
     if (typeof value === 'string' && !value) {
       value = label === 'homeValue' || label === 'hoaFess' ? '0' : ''
+
+      if (label === 'oneTime' || label === 'monthlyOrBiWeekly' || label === 'quarterly' || label === 'yearly') {
+        setInput({
+          ...input,
+          [key]: {
+            ...input[key],
+            payment: value,
+          },
+        })
+
+        return
+      }
     }
 
     setInput({...input, [label]: value})
@@ -103,8 +115,8 @@ export default function Home() {
     )
   }
 
-  const handleInputValue = (state, key) =>
-    state ? input[key].value : numbro(input[key].value).format({thousandSeparated: true})
+  const handleInputValue = (state, key, thousandSeparated = true) =>
+    state ? input[key].value : numbro(input[key].value).format({thousandSeparated})
 
   const handleInputWithDate = (key, value) => {
     if (typeof value === 'string' && !value) {
@@ -121,6 +133,7 @@ export default function Home() {
   }
 
   // console.log(input.oneTime, inputWithDate)
+  // console.log('rendered')
   return (
     <ScrollView>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -167,7 +180,7 @@ export default function Home() {
                   onPress={handleInputSwitchOnPress(setPdForTermLength, 'loanTerm')}
                 />
               }
-              value={handleInputValue(pdForTermLength, 'loanTerm')}
+              value={handleInputValue(pdForTermLength, 'loanTerm', false)}
               onChangeText={value => handleInputOnChangeText(value, pdForTermLength, 'loanTerm')}
             />
 
@@ -255,7 +268,7 @@ export default function Home() {
                 label="One Time"
                 keyboardType="decimal-pad"
                 icon={handleInputIncon(0)}
-                onChangeText={value => handleInputWithDate('oneTime', value)}
+                onChangeText={value => handleChange('oneTime', value)}
               />
               <TextInput
                 containerStyle={{width: '45%'}}
@@ -276,7 +289,7 @@ export default function Home() {
                 label="Monthly or Bi-Weekly"
                 keyboardType="decimal-pad"
                 icon={handleInputIncon(0)}
-                onChangeText={value => handleInputWithDate('monthlyOrBiWeekly', value)}
+                onChangeText={value => handleChange('monthlyOrBiWeekly', value)}
               />
               <TextInput
                 containerStyle={{width: '45%'}}
@@ -297,7 +310,7 @@ export default function Home() {
                 label="Quarterly"
                 keyboardType="decimal-pad"
                 icon={handleInputIncon(0)}
-                onChangeText={value => handleInputWithDate('quarterly', value)}
+                onChangeText={value => handleChange('quarterly', value)}
               />
               <TextInput
                 containerStyle={{width: '45%'}}
@@ -318,7 +331,7 @@ export default function Home() {
                 label="Yearly"
                 keyboardType="decimal-pad"
                 icon={handleInputIncon(0)}
-                onChangeText={value => handleInputWithDate('yearly', value)}
+                onChangeText={value => handleChange('yearly', value)}
               />
               <TextInput
                 containerStyle={{width: '45%'}}
