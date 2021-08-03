@@ -39,7 +39,7 @@ export default function Home() {
   const handleConfirm = date => {
     Keyboard.dismiss()
 
-    if (inputWithDate) {
+    if (inputWithDate !== 'startDate') {
       setInput({
         ...input,
         [inputWithDate]: {
@@ -50,7 +50,6 @@ export default function Home() {
     } else {
       handleChange('startDate', date)
     }
-
     hideDatePicker()
   }
 
@@ -59,24 +58,9 @@ export default function Home() {
     [],
   )
 
-  const handleChange = (label, value) => {
-    if (typeof value === 'string' && !value) {
-      value = label === 'homeValue' || label === 'hoaFess' ? '0' : ''
-
-      if (label === 'oneTime' || label === 'monthlyOrBiWeekly' || label === 'quarterly' || label === 'yearly') {
-        setInput({
-          ...input,
-          [key]: {
-            ...input[key],
-            payment: value,
-          },
-        })
-
-        return
-      }
-    }
-
-    setInput({...input, [label]: value})
+  // Function that update the input state and global input
+  const handleChange = (key, value) => {
+    setInput({...input, [key]: value})
     // onChangeHandler(label, value, dispatch)
   }
 
@@ -95,13 +79,12 @@ export default function Home() {
     })
   }
 
-  const handleInputOnChangeText = (value, state, key) => {
-    if (!value) value = state ? '' : '0'
+  const handleExtraPaymentInput = (key, value) => {
+    if (!value) value = '0'
 
     handleChange(`${key}`, {
       ...input[key],
-      [state]: value,
-      value,
+      payment: value,
     })
   }
 
@@ -118,22 +101,21 @@ export default function Home() {
   const handleInputValue = (state, key, thousandSeparated = true) =>
     state ? input[key].value : numbro(input[key].value).format({thousandSeparated})
 
-  const handleInputWithDate = (key, value) => {
-    if (typeof value === 'string' && !value) {
-      value = key === 'oneTime' || key === 'monthlyOrBiWeekly' || key === 'quarterly' || key === 'yearly' ? '0' : ''
-    }
+  const handleInputChange = (key, value) => {
+    if (!value) value = '0'
+    handleChange(key, value)
+  }
 
-    setInput({
-      ...input,
-      [key]: {
-        ...input[key],
-        payment: value,
-      },
+  const handleInputOnChangeTextWithSwitch = (key, value, state) => {
+    if (!value) value = state && key !== 'loanTerm' ? '' : '0'
+
+    handleChange(`${key}`, {
+      ...input[key],
+      [state]: value,
+      value,
     })
   }
 
-  // console.log(input.oneTime, inputWithDate)
-  // console.log('rendered')
   return (
     <ScrollView>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -144,7 +126,7 @@ export default function Home() {
               keyboardType="decimal-pad"
               value={numbro(input.homeValue).format({thousandSeparated: true})}
               icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
-              onChangeText={homeValue => handleChange('homeValue', homeValue)}
+              onChangeText={homeValue => handleInputChange('homeValue', homeValue)}
             />
 
             <TextInput
@@ -159,7 +141,7 @@ export default function Home() {
               }
               value={handleInputValue(pdForDownPayment, 'downPayment')}
               icon={handleInputIncon(pdForDownPayment)}
-              onChangeText={value => handleInputOnChangeText(value, pdForDownPayment, 'downPayment')}
+              onChangeText={value => handleInputOnChangeTextWithSwitch('downPayment', value, pdForDownPayment)}
             />
 
             <TextInput
@@ -167,7 +149,7 @@ export default function Home() {
               keyboardType="decimal-pad"
               value={numbro(input.mortgageAmount).format({thousandSeparated: true})}
               icon={handleInputIncon(0)}
-              onChangeText={value => handleChange('mortgageAmount', value)}
+              onChangeText={value => handleInputChange('mortgageAmount', value)}
             />
 
             <TextInput
@@ -181,16 +163,16 @@ export default function Home() {
                 />
               }
               value={handleInputValue(pdForTermLength, 'loanTerm', false)}
-              onChangeText={value => handleInputOnChangeText(value, pdForTermLength, 'loanTerm')}
+              onChangeText={value => handleInputOnChangeTextWithSwitch('loanTerm', value, pdForTermLength)}
             />
 
             <TextInput
               reverse
-              value={input.interest}
+              value={input.interest === '0' ? '' : input.interest}
               label="Interest Rate"
               keyboardType="decimal-pad"
               icon={handleInputIncon(1)}
-              onChangeText={interest => handleChange('interest', interest)}
+              onChangeText={interest => handleInputChange('interest', interest)}
             />
 
             <TextInput
@@ -200,7 +182,7 @@ export default function Home() {
               optionSwitch={<Switch value={pdForPMI} onPress={handleInputSwitchOnPress(setPdForPMI, 'pmi')} />}
               value={handleInputValue(pdForPMI, 'pmi')}
               icon={handleInputIncon(pdForPMI)}
-              onChangeText={value => handleInputOnChangeText(value, pdForPMI, 'pmi')}
+              onChangeText={value => handleInputOnChangeTextWithSwitch('pmi', value, pdForPMI)}
             />
 
             <TextInput
@@ -215,7 +197,7 @@ export default function Home() {
               }
               value={handleInputValue(pdForPropertyTax, 'propertTax')}
               icon={handleInputIncon(pdForPropertyTax)}
-              onChangeText={value => handleInputOnChangeText(value, pdForPropertyTax, 'propertTax')}
+              onChangeText={value => handleInputOnChangeTextWithSwitch('propertTax', value, pdForPropertyTax)}
             />
 
             <TextInput
@@ -230,7 +212,7 @@ export default function Home() {
               }
               value={handleInputValue(pdForHomeInsurance, 'homeInsurance')}
               icon={handleInputIncon(pdForHomeInsurance)}
-              onChangeText={value => handleInputOnChangeText(value, pdForHomeInsurance, 'homeInsurance')}
+              onChangeText={value => handleInputOnChangeTextWithSwitch('homeInsurance', value, pdForHomeInsurance)}
             />
 
             <TextInput
@@ -238,23 +220,25 @@ export default function Home() {
               label="HOA Fees (Monthly)"
               keyboardType="decimal-pad"
               icon={handleInputIncon(0)}
-              onChangeText={value => handleChange('hoaFess', value)}
+              onChangeText={value => handleInputChange('hoaFess', value)}
             />
 
+            {/* Loan Term */}
             <LoanTerm
               value={input.paymentFrequency}
               leftLabel="Payment Frequency"
               data={['Monthly', 'Bi-Weekly']}
-              onChange={value => handleChange('paymentFrequency', value)}
+              onChange={value => handleInputChange('paymentFrequency', value)}
             />
 
+            {/* Start Date */}
             <TextInput
               reverse
               clickable={true}
               value={formatDate(input.startDate)}
               label="Start Date"
               icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
-              onPress={showDatePicker}
+              onPress={() => showDatePicker('startDate')}
             />
 
             <Text style={{fontFamily: fontFamily.MONTSERRAT_BOLD, color: colors.gray600, marginVertical: 16}}>
@@ -268,8 +252,9 @@ export default function Home() {
                 label="One Time"
                 keyboardType="decimal-pad"
                 icon={handleInputIncon(0)}
-                onChangeText={value => handleChange('oneTime', value)}
+                onChangeText={value => handleExtraPaymentInput('oneTime', value)}
               />
+
               <TextInput
                 containerStyle={{width: '45%'}}
                 inputPressableStyle={{fontSize: 12}}
@@ -289,7 +274,7 @@ export default function Home() {
                 label="Monthly or Bi-Weekly"
                 keyboardType="decimal-pad"
                 icon={handleInputIncon(0)}
-                onChangeText={value => handleChange('monthlyOrBiWeekly', value)}
+                onChangeText={value => handleExtraPaymentInput('monthlyOrBiWeekly', value)}
               />
               <TextInput
                 containerStyle={{width: '45%'}}
@@ -310,7 +295,7 @@ export default function Home() {
                 label="Quarterly"
                 keyboardType="decimal-pad"
                 icon={handleInputIncon(0)}
-                onChangeText={value => handleChange('quarterly', value)}
+                onChangeText={value => handleExtraPaymentInput('quarterly', value)}
               />
               <TextInput
                 containerStyle={{width: '45%'}}
@@ -331,7 +316,7 @@ export default function Home() {
                 label="Yearly"
                 keyboardType="decimal-pad"
                 icon={handleInputIncon(0)}
-                onChangeText={value => handleChange('yearly', value)}
+                onChangeText={value => handleExtraPaymentInput('yearly', value)}
               />
               <TextInput
                 containerStyle={{width: '45%'}}
