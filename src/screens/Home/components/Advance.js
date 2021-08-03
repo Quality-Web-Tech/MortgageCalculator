@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {Keyboard, TouchableWithoutFeedback, View, Text, Switch as NativeSwitch, ScrollView} from 'react-native'
+import {Keyboard, TouchableWithoutFeedback, View, Text, ScrollView} from 'react-native'
 import colors from 'styles/colors'
 import {MaterialIcons, FontAwesome5} from '@expo/vector-icons'
 import variables from 'styles/variables'
@@ -13,6 +13,7 @@ import {debounce} from 'lodash/fp'
 import numbro from 'numbro'
 import Switch from './Switch'
 import fontFamily from '../../../styles/fontFamily'
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 
 export default function Home() {
   const [, dispatch] = useBasicMortgageCalculator()
@@ -121,213 +122,225 @@ export default function Home() {
 
   // console.log(input.oneTime, inputWithDate)
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <Container>
-        <ScrollView>
-          <TextInput
-            label="Home Value"
-            keyboardType="decimal-pad"
-            value={numbro(input.homeValue).format({thousandSeparated: true})}
-            icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
-            onChangeText={homeValue => handleChange('homeValue', homeValue)}
-          />
+    <ScrollView>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <KeyboardAwareScrollView>
+          <Container>
+            <TextInput
+              label="Home Value"
+              keyboardType="decimal-pad"
+              value={numbro(input.homeValue).format({thousandSeparated: true})}
+              icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
+              onChangeText={homeValue => handleChange('homeValue', homeValue)}
+            />
 
-          <TextInput
-            label="Down Payment"
-            keyboardType="decimal-pad"
-            reverse={pdForDownPayment}
-            optionSwitch={
-              <Switch value={pdForDownPayment} onPress={handleInputSwitchOnPress(setPdForDownPayment, 'downPayment')} />
-            }
-            value={handleInputValue(pdForDownPayment, 'downPayment')}
-            icon={handleInputIncon(pdForDownPayment)}
-            onChangeText={value => handleInputOnChangeText(value, pdForDownPayment, 'downPayment')}
-          />
+            <TextInput
+              label="Down Payment"
+              keyboardType="decimal-pad"
+              reverse={pdForDownPayment}
+              optionSwitch={
+                <Switch
+                  value={pdForDownPayment}
+                  onPress={handleInputSwitchOnPress(setPdForDownPayment, 'downPayment')}
+                />
+              }
+              value={handleInputValue(pdForDownPayment, 'downPayment')}
+              icon={handleInputIncon(pdForDownPayment)}
+              onChangeText={value => handleInputOnChangeText(value, pdForDownPayment, 'downPayment')}
+            />
 
-          <TextInput
-            label="Mortgage Amount"
-            keyboardType="decimal-pad"
-            value={numbro(input.mortgageAmount).format({thousandSeparated: true})}
-            icon={handleInputIncon(0)}
-            onChangeText={value => handleChange('mortgageAmount', value)}
-          />
+            <TextInput
+              label="Mortgage Amount"
+              keyboardType="decimal-pad"
+              value={numbro(input.mortgageAmount).format({thousandSeparated: true})}
+              icon={handleInputIncon(0)}
+              onChangeText={value => handleChange('mortgageAmount', value)}
+            />
 
-          <TextInput
-            label="Length Of Loan"
-            keyboardType="decimal-pad"
-            optionSwitch={
-              <Switch term value={pdForTermLength} onPress={handleInputSwitchOnPress(setPdForTermLength, 'loanTerm')} />
-            }
-            value={handleInputValue(pdForTermLength, 'loanTerm')}
-            onChangeText={value => handleInputOnChangeText(value, pdForTermLength, 'loanTerm')}
-          />
+            <TextInput
+              label="Length Of Loan"
+              keyboardType="decimal-pad"
+              optionSwitch={
+                <Switch
+                  term
+                  value={pdForTermLength}
+                  onPress={handleInputSwitchOnPress(setPdForTermLength, 'loanTerm')}
+                />
+              }
+              value={handleInputValue(pdForTermLength, 'loanTerm')}
+              onChangeText={value => handleInputOnChangeText(value, pdForTermLength, 'loanTerm')}
+            />
 
-          <TextInput
-            reverse
-            value={input.interest}
-            label="Interest Rate"
-            keyboardType="decimal-pad"
-            icon={handleInputIncon(1)}
-            onChangeText={interest => handleChange('interest', interest)}
-          />
+            <TextInput
+              reverse
+              value={input.interest}
+              label="Interest Rate"
+              keyboardType="decimal-pad"
+              icon={handleInputIncon(1)}
+              onChangeText={interest => handleChange('interest', interest)}
+            />
 
-          <TextInput
-            label="PMI (Yearly)"
-            keyboardType="decimal-pad"
-            reverse
-            optionSwitch={<Switch value={pdForPMI} onPress={handleInputSwitchOnPress(setPdForPMI, 'pmi')} />}
-            value={handleInputValue(pdForPMI, 'pmi')}
-            icon={handleInputIncon(pdForPMI)}
-            onChangeText={value => handleInputOnChangeText(value, pdForPMI, 'pmi')}
-          />
+            <TextInput
+              label="PMI (Yearly)"
+              keyboardType="decimal-pad"
+              reverse
+              optionSwitch={<Switch value={pdForPMI} onPress={handleInputSwitchOnPress(setPdForPMI, 'pmi')} />}
+              value={handleInputValue(pdForPMI, 'pmi')}
+              icon={handleInputIncon(pdForPMI)}
+              onChangeText={value => handleInputOnChangeText(value, pdForPMI, 'pmi')}
+            />
 
-          <TextInput
-            label="Property Tax (Yearly)"
-            keyboardType="decimal-pad"
-            reverse
-            optionSwitch={
-              <Switch value={pdForPropertyTax} onPress={handleInputSwitchOnPress(setPdForPropertyTax, 'propertTax')} />
-            }
-            value={handleInputValue(pdForPropertyTax, 'propertTax')}
-            icon={handleInputIncon(pdForPropertyTax)}
-            onChangeText={value => handleInputOnChangeText(value, pdForPropertyTax, 'propertTax')}
-          />
+            <TextInput
+              label="Property Tax (Yearly)"
+              keyboardType="decimal-pad"
+              reverse
+              optionSwitch={
+                <Switch
+                  value={pdForPropertyTax}
+                  onPress={handleInputSwitchOnPress(setPdForPropertyTax, 'propertTax')}
+                />
+              }
+              value={handleInputValue(pdForPropertyTax, 'propertTax')}
+              icon={handleInputIncon(pdForPropertyTax)}
+              onChangeText={value => handleInputOnChangeText(value, pdForPropertyTax, 'propertTax')}
+            />
 
-          <TextInput
-            label="Home Insurance (Yearly)"
-            keyboardType="decimal-pad"
-            reverse
-            optionSwitch={
-              <Switch
-                value={pdForHomeInsurance}
-                onPress={handleInputSwitchOnPress(setPdForHomeInsurance, 'homeInsurance')}
+            <TextInput
+              label="Home Insurance (Yearly)"
+              keyboardType="decimal-pad"
+              reverse
+              optionSwitch={
+                <Switch
+                  value={pdForHomeInsurance}
+                  onPress={handleInputSwitchOnPress(setPdForHomeInsurance, 'homeInsurance')}
+                />
+              }
+              value={handleInputValue(pdForHomeInsurance, 'homeInsurance')}
+              icon={handleInputIncon(pdForHomeInsurance)}
+              onChangeText={value => handleInputOnChangeText(value, pdForHomeInsurance, 'homeInsurance')}
+            />
+
+            <TextInput
+              value={numbro(input.hoaFess).format({thousandSeparated: true})}
+              label="HOA Fees (Monthly)"
+              keyboardType="decimal-pad"
+              icon={handleInputIncon(0)}
+              onChangeText={value => handleChange('hoaFess', value)}
+            />
+
+            <LoanTerm
+              value={input.paymentFrequency}
+              leftLabel="Payment Frequency"
+              data={['Monthly', 'Bi-Weekly']}
+              onChange={value => handleChange('paymentFrequency', value)}
+            />
+
+            <TextInput
+              reverse
+              clickable={true}
+              value={formatDate(input.startDate)}
+              label="Start Date"
+              icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
+              onPress={showDatePicker}
+            />
+
+            <Text style={{fontFamily: fontFamily.MONTSERRAT_BOLD, color: colors.gray600, marginVertical: 16}}>
+              EXTRA PAYMENT
+            </Text>
+
+            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <TextInput
+                containerStyle={{width: '45%'}}
+                value={numbro(input.oneTime.payment).format({thousandSeparated: true})}
+                label="One Time"
+                keyboardType="decimal-pad"
+                icon={handleInputIncon(0)}
+                onChangeText={value => handleInputWithDate('oneTime', value)}
               />
-            }
-            value={handleInputValue(pdForHomeInsurance, 'homeInsurance')}
-            icon={handleInputIncon(pdForHomeInsurance)}
-            onChangeText={value => handleInputOnChangeText(value, pdForHomeInsurance, 'homeInsurance')}
-          />
+              <TextInput
+                containerStyle={{width: '45%'}}
+                inputPressableStyle={{fontSize: 12}}
+                reverse
+                clickable={true}
+                value={formatDate(input.oneTime.startDate)}
+                label="On"
+                icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
+                onPress={() => showDatePicker('oneTime')}
+              />
+            </View>
 
-          <TextInput
-            value={numbro(input.hoaFess).format({thousandSeparated: true})}
-            label="HOA Fees (Monthly)"
-            keyboardType="decimal-pad"
-            icon={handleInputIncon(0)}
-            onChangeText={value => handleChange('hoaFess', value)}
-          />
+            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <TextInput
+                containerStyle={{width: '45%'}}
+                value={numbro(input.monthlyOrBiWeekly.payment).format({thousandSeparated: true})}
+                label="Monthly or Bi-Weekly"
+                keyboardType="decimal-pad"
+                icon={handleInputIncon(0)}
+                onChangeText={value => handleInputWithDate('monthlyOrBiWeekly', value)}
+              />
+              <TextInput
+                containerStyle={{width: '45%'}}
+                inputPressableStyle={{fontSize: 12}}
+                reverse
+                clickable={true}
+                value={formatDate(input.monthlyOrBiWeekly.startDate)}
+                label="On"
+                icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
+                onPress={() => showDatePicker('monthlyOrBiWeekly')}
+              />
+            </View>
 
-          <LoanTerm
-            value={input.paymentFrequency}
-            leftLabel="Payment Frequency"
-            data={['Monthly', 'Bi-Weekly']}
-            onChange={value => handleChange('paymentFrequency', value)}
-          />
+            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <TextInput
+                containerStyle={{width: '45%'}}
+                value={numbro(input.quarterly.payment).format({thousandSeparated: true})}
+                label="Quarterly"
+                keyboardType="decimal-pad"
+                icon={handleInputIncon(0)}
+                onChangeText={value => handleInputWithDate('quarterly', value)}
+              />
+              <TextInput
+                containerStyle={{width: '45%'}}
+                inputPressableStyle={{fontSize: 12}}
+                reverse
+                clickable={true}
+                value={formatDate(input.quarterly.startDate)}
+                label="On"
+                icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
+                onPress={() => showDatePicker('quarterly')}
+              />
+            </View>
 
-          <TextInput
-            reverse
-            clickable={true}
-            value={formatDate(input.startDate)}
-            label="Start Date"
-            icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
-            onPress={showDatePicker}
-          />
+            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <TextInput
+                containerStyle={{width: '45%'}}
+                value={numbro(input.yearly.payment).format({thousandSeparated: true})}
+                label="Yearly"
+                keyboardType="decimal-pad"
+                icon={handleInputIncon(0)}
+                onChangeText={value => handleInputWithDate('yearly', value)}
+              />
+              <TextInput
+                containerStyle={{width: '45%'}}
+                inputPressableStyle={{fontSize: 12}}
+                reverse
+                clickable={true}
+                value={formatDate(input.yearly.startDate)}
+                label="On"
+                icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
+                onPress={() => showDatePicker('yearly')}
+              />
+            </View>
 
-          <Text style={{fontFamily: fontFamily.MONTSERRAT_BOLD, color: colors.gray600, marginVertical: 16}}>
-            EXTRA PAYMENT
-          </Text>
-
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <TextInput
-              containerStyle={{width: '45%'}}
-              value={numbro(input.oneTime.payment).format({thousandSeparated: true})}
-              label="One Time"
-              keyboardType="decimal-pad"
-              icon={handleInputIncon(0)}
-              onChangeText={value => handleInputWithDate('oneTime', value)}
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="date"
+              onConfirm={handleConfirm}
+              onCancel={hideDatePicker}
             />
-            <TextInput
-              containerStyle={{width: '45%'}}
-              inputPressableStyle={{fontSize: 12}}
-              reverse
-              clickable={true}
-              value={formatDate(input.oneTime.startDate)}
-              label="On"
-              icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
-              onPress={() => showDatePicker('oneTime')}
-            />
-          </View>
-
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <TextInput
-              containerStyle={{width: '45%'}}
-              value={numbro(input.monthlyOrBiWeekly.payment).format({thousandSeparated: true})}
-              label="Monthly or Bi-Weekly"
-              keyboardType="decimal-pad"
-              icon={handleInputIncon(0)}
-              onChangeText={value => handleInputWithDate('monthlyOrBiWeekly', value)}
-            />
-            <TextInput
-              containerStyle={{width: '45%'}}
-              inputPressableStyle={{fontSize: 12}}
-              reverse
-              clickable={true}
-              value={formatDate(input.monthlyOrBiWeekly.startDate)}
-              label="On"
-              icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
-              onPress={() => showDatePicker('monthlyOrBiWeekly')}
-            />
-          </View>
-
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <TextInput
-              containerStyle={{width: '45%'}}
-              value={numbro(input.quarterly.payment).format({thousandSeparated: true})}
-              label="Quarterly"
-              keyboardType="decimal-pad"
-              icon={handleInputIncon(0)}
-              onChangeText={value => handleInputWithDate('quarterly', value)}
-            />
-            <TextInput
-              containerStyle={{width: '45%'}}
-              inputPressableStyle={{fontSize: 12}}
-              reverse
-              clickable={true}
-              value={formatDate(input.quarterly.startDate)}
-              label="On"
-              icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
-              onPress={() => showDatePicker('quarterly')}
-            />
-          </View>
-
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <TextInput
-              containerStyle={{width: '45%'}}
-              value={numbro(input.yearly.payment).format({thousandSeparated: true})}
-              label="Yearly"
-              keyboardType="decimal-pad"
-              icon={handleInputIncon(0)}
-              onChangeText={value => handleInputWithDate('yearly', value)}
-            />
-            <TextInput
-              containerStyle={{width: '45%'}}
-              inputPressableStyle={{fontSize: 12}}
-              reverse
-              clickable={true}
-              value={formatDate(input.yearly.startDate)}
-              label="On"
-              icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
-              onPress={() => showDatePicker('yearly')}
-            />
-          </View>
-
-          <DateTimePickerModal
-            isVisible={isDatePickerVisible}
-            mode="date"
-            onConfirm={handleConfirm}
-            onCancel={hideDatePicker}
-          />
-        </ScrollView>
-      </Container>
-    </TouchableWithoutFeedback>
+          </Container>
+        </KeyboardAwareScrollView>
+      </TouchableWithoutFeedback>
+    </ScrollView>
   )
 }
