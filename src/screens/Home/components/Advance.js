@@ -8,7 +8,7 @@ import LoanTerm from './LoanTerm'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
 import {useAdvanceMortgageCalculator, updateAdvanceForm} from '../../../context/advanceMortgageCalculator'
 import {formatDate} from '../../../utils/formatter'
-import {INITIAL_STATE} from '../../../context/advanceMortgageCalculator'
+import {FORM_INITIAL_STATE} from '../../../context/advanceMortgageCalculator'
 import {debounce} from 'lodash/fp'
 import numbro from 'numbro'
 import Switch from './Switch'
@@ -18,7 +18,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 export default function Home() {
   const [, dispatch] = useAdvanceMortgageCalculator()
 
-  const [input, setInput] = useState(INITIAL_STATE)
+  const [input, setInput] = useState(FORM_INITIAL_STATE)
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
   const [pdForDownPayment, setPdForDownPayment] = useState(true)
   const [pdForTermLength, setPdForTermLength] = useState(false)
@@ -60,11 +60,27 @@ export default function Home() {
 
   // Function that update the input state and global input
   const handleChange = (key, value) => {
-    setInput({...input, [key]: value})
-    // onChangeHandler(label, value, dispatch)
+    const newInputState = {...input, [key]: value}
+
+    // calculate new mortgage
+    let {homeValue, downPayment} = newInputState
+    let mortgageAmount
+    let {value: percent, percent: isPercent} = downPayment
+    homeValue = Number(homeValue.replace(/\,/g, ''))
+    percent = Number(percent)
+
+    if (isPercent) {
+      percent /= 100
+      mortgageAmount = homeValue - homeValue * percent
+    } else {
+      mortgageAmount = homeValue - percent
+    }
+
+    setInput({...newInputState, mortgageAmount})
+    onChangeHandler(newInputState, dispatch)
   }
 
-  const handleInputSwitchOnPress = (setState, key) => () => {
+  const handleInputSwitchOnPress = (setState, key, type) => () => {
     setState(previousState => {
       const newState = !previousState
 
@@ -73,6 +89,7 @@ export default function Home() {
         [key]: {
           ...input[key],
           value: input[key][newState],
+          [type]: !input[key][type],
         },
       })
       return newState
@@ -136,7 +153,7 @@ export default function Home() {
               optionSwitch={
                 <Switch
                   value={pdForDownPayment}
-                  onPress={handleInputSwitchOnPress(setPdForDownPayment, 'downPayment')}
+                  onPress={handleInputSwitchOnPress(setPdForDownPayment, 'downPayment', 'percent')}
                 />
               }
               value={handleInputValue(pdForDownPayment, 'downPayment')}
@@ -159,7 +176,7 @@ export default function Home() {
                 <Switch
                   term
                   value={pdForTermLength}
-                  onPress={handleInputSwitchOnPress(setPdForTermLength, 'loanTerm')}
+                  onPress={handleInputSwitchOnPress(setPdForTermLength, 'loanTerm', 'year')}
                 />
               }
               value={handleInputValue(pdForTermLength, 'loanTerm', false)}
@@ -179,7 +196,9 @@ export default function Home() {
               label="PMI (Yearly)"
               keyboardType="decimal-pad"
               reverse
-              optionSwitch={<Switch value={pdForPMI} onPress={handleInputSwitchOnPress(setPdForPMI, 'pmi')} />}
+              optionSwitch={
+                <Switch value={pdForPMI} onPress={handleInputSwitchOnPress(setPdForPMI, 'pmi', 'percent')} />
+              }
               value={handleInputValue(pdForPMI, 'pmi')}
               icon={handleInputIncon(pdForPMI)}
               onChangeText={value => handleInputOnChangeTextWithSwitch('pmi', value, pdForPMI)}
@@ -192,7 +211,7 @@ export default function Home() {
               optionSwitch={
                 <Switch
                   value={pdForPropertyTax}
-                  onPress={handleInputSwitchOnPress(setPdForPropertyTax, 'propertTax')}
+                  onPress={handleInputSwitchOnPress(setPdForPropertyTax, 'propertTax', 'percent')}
                 />
               }
               value={handleInputValue(pdForPropertyTax, 'propertTax')}
@@ -207,7 +226,7 @@ export default function Home() {
               optionSwitch={
                 <Switch
                   value={pdForHomeInsurance}
-                  onPress={handleInputSwitchOnPress(setPdForHomeInsurance, 'homeInsurance')}
+                  onPress={handleInputSwitchOnPress(setPdForHomeInsurance, 'homeInsurance', 'percent')}
                 />
               }
               value={handleInputValue(pdForHomeInsurance, 'homeInsurance')}
@@ -223,7 +242,6 @@ export default function Home() {
               onChangeText={value => handleInputChange('hoaFess', value)}
             />
 
-            {/* Loan Term */}
             <LoanTerm
               value={input.paymentFrequency}
               leftLabel="Payment Frequency"
@@ -231,7 +249,6 @@ export default function Home() {
               onChange={value => handleInputChange('paymentFrequency', value)}
             />
 
-            {/* Start Date */}
             <TextInput
               reverse
               clickable={true}
