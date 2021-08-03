@@ -26,34 +26,53 @@ const newStateWithMonthlyPaymentRaw = (state, action) => {
 
 export const INITIAL_STATE = {
   homeValue: '300000',
-  downPayment: '15.00',
-  mortgageAmount: '255000',
-  loanTerm: 30,
-  interest: '5.00',
-  pmi: '0.50',
-  propertTax: '3000',
-  homeInsurance: '1500',
-  hoaFess: '0.00',
-  paymentFrequency: 'monthly',
-  startDate: new Date(),
-  extraPayment: {
-    oneTime: {
-      payment: '0.00',
-      startDate: new Date(),
-    },
-    monthlyOrBiWeekly: {
-      payment: '0.00',
-      startDate: new Date(),
-    },
-    quarterky: {
-      payment: '0.00',
-      startDate: new Date(),
-    },
-    yearly: {
-      payment: '0.00',
-      startDate: new Date(),
-    },
+  downPayment: {
+    true: '15.00',
+    false: '45000',
+    value: '15.00',
   },
+  mortgageAmount: '255000',
+  loanTerm: {
+    true: '360',
+    false: '30',
+    value: '30',
+  },
+  interest: '5.00',
+  pmi: {
+    true: '0.50',
+    false: '1275',
+    value: '0.50',
+  },
+  propertTax: {
+    true: '1.00',
+    false: '3000',
+    value: '3000',
+  },
+  homeInsurance: {
+    true: '0.50',
+    false: '1500',
+    value: '1500',
+  },
+  hoaFess: '0',
+  paymentFrequency: 'Monthly',
+  startDate: new Date(),
+  oneTime: {
+    payment: '0.00',
+    startDate: new Date(),
+  },
+  monthlyOrBiWeekly: {
+    payment: '0.00',
+    startDate: new Date(),
+  },
+  quarterly: {
+    payment: '0.00',
+    startDate: new Date(),
+  },
+  yearly: {
+    payment: '0.00',
+    startDate: new Date(),
+  },
+
   monthlyPaymentRaw: preCalculateMonthlyPaymentRaw({
     mortgageAmount: '100000',
     interest: '2.00',

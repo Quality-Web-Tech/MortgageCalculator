@@ -5,13 +5,13 @@ import colors from 'styles/colors'
 import themes from 'styles/themes'
 import variables from 'styles/variables'
 
-const TextInput = ({label, active, ...props}) => {
+const TextInput = ({label, active, normal, ...props}) => {
   return (
     <Pressable
       style={{
         borderWidth: 1,
         borderColor: themes.borderActive,
-        width: 70,
+        width: normal ? 70 : '45%',
         paddingVertical: 8,
         paddingHorizontal: 12,
         alignItems: 'center',

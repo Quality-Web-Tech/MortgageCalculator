@@ -4,6 +4,8 @@ import fontFamily from 'styles/fontFamily'
 import colors from 'styles/colors'
 import {Button} from 'components'
 
+const terms = [10, 15, 20, 30]
+
 const Label = ({label}) => (
   <Text
     style={{
@@ -16,9 +18,9 @@ const Label = ({label}) => (
   </Text>
 )
 
-const LoanTerm = ({leftLabel, rightLabel, value, onChange, data = [10, 15, 20, 30], ...props}) => {
-  const selectValue = value => {
-    onChange(value)
+const LoanTerm = ({leftLabel, rightLabel, loanTerm, onChangeTerm}) => {
+  const selectYearTerm = year => {
+    onChangeTerm(year)
   }
   return (
     <View style={{marginVertical: 8}}>
@@ -27,8 +29,8 @@ const LoanTerm = ({leftLabel, rightLabel, value, onChange, data = [10, 15, 20, 3
         <Label label={rightLabel} />
       </View>
       <View style={{marginVertical: 8, flexDirection: 'row', justifyContent: 'space-between'}}>
-        {data.map(item => (
-          <Button key={item} label={item} active={item === value} onPress={() => selectValue(item)} {...props} />
+        {terms.map(year => (
+          <Button key={year} label={year} active={year === loanTerm} onPress={() => selectYearTerm(year)} />
         ))}
       </View>
     </View>

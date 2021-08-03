@@ -60,8 +60,10 @@ export default function Basic() {
         <LoanTerm
           leftLabel="Length of Loan"
           rightLabel="Years"
-          loanTerm={input.loanTerm}
-          onChangeTerm={loanTerm => handleChange('loanTerm', loanTerm)}
+          value={input.loanTerm}
+          normal
+          buttonStyle={{width: 70}}
+          onChange={loanTerm => handleChange('loanTerm', loanTerm)}
         />
         <TextInput
           reverse
