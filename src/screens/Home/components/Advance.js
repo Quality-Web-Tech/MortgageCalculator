@@ -211,12 +211,12 @@ export default function Home() {
               optionSwitch={
                 <Switch
                   value={pdForPropertyTax}
-                  onPress={handleInputSwitchOnPress(setPdForPropertyTax, 'propertTax', 'percent')}
+                  onPress={handleInputSwitchOnPress(setPdForPropertyTax, 'propertyTax', 'percent')}
                 />
               }
-              value={handleInputValue(pdForPropertyTax, 'propertTax')}
+              value={handleInputValue(pdForPropertyTax, 'propertyTax')}
               icon={handleInputIncon(pdForPropertyTax)}
-              onChangeText={value => handleInputOnChangeTextWithSwitch('propertTax', value, pdForPropertyTax)}
+              onChangeText={value => handleInputOnChangeTextWithSwitch('propertyTax', value, pdForPropertyTax)}
             />
 
             <TextInput

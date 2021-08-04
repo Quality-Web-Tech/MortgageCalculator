@@ -24,34 +24,39 @@ const newStateWithMonthlyPaymentRaw = (state, action) => {
   return {...newState, basic: {...newState.basic, monthlyPaymentRaw}}
 }
 
-export const INITIAL_STATE = {
+export const FORM_INITIAL_STATE = {
   homeValue: '300000',
   downPayment: {
     true: '15.00',
     false: '45000',
     value: '15.00',
+    percent: true,
   },
   mortgageAmount: '255000',
   loanTerm: {
     true: '360',
     false: '30',
     value: '30',
+    year: true,
   },
   interest: '5.00',
   pmi: {
     true: '0.50',
     false: '1275',
     value: '0.50',
+    percent: true,
   },
-  propertTax: {
+  propertyTax: {
     true: '1.00',
     false: '3000',
     value: '3000',
+    percent: false,
   },
   homeInsurance: {
     true: '0.50',
     false: '1500',
     value: '1500',
+    percent: false,
   },
   hoaFess: '0',
   paymentFrequency: 'Monthly',
@@ -80,18 +85,53 @@ export const INITIAL_STATE = {
   }),
 }
 
+export const INITIAL_STATE = {
+  homeValue: '300000',
+  downPayment: 45000,
+  mortgageAmount: 255000,
+  loanTerm: 30,
+  interest: '5.00',
+  pmi: 1275,
+  propertyTax: 3000,
+  homeInsurance: 1500,
+  hoaFees: 0,
+  paymentFrequency: 'Monthly',
+  startDate: new Date(),
+  oneTime: {
+    payment: 0,
+    startDate: new Date(),
+  },
+  monthlyOrBiWeekly: {
+    payment: 0,
+    startDate: new Date(),
+  },
+  quarterly: {
+    payment: 0,
+    startDate: new Date(),
+  },
+  yearly: {
+    payment: 0,
+    startDate: new Date(),
+  },
+
+  monthlyPaymentRaw: 0,
+}
+
 function AdvanceMortgageCalculatorProvider(props) {
   const [state, dispatch] = useReducer(
     (state, action) => {
       switch (action.type) {
-        case 'UPDATE_ADVANCE_FORM': {
-          if (action.field === 'startDate' || action.field === 'loanTerm') {
-            return newStateWithMonthlyPaymentRaw(state, action)
+        case 'UPDATE_ADVANCE_FORM':
+          {
+            // console.log(action.form)
+            // if (action.field === 'startDate' || action.field === 'loanTerm') {
+            //   return newStateWithMonthlyPaymentRaw(state, action)
+            // }
+            // action.data = action.data.replace(/\,/g, '') // remove all comma
+            // return newStateWithMonthlyPaymentRaw(state, action)
           }
 
-          action.data = action.data.replace(/\,/g, '') // remove all comma
-          return newStateWithMonthlyPaymentRaw(state, action)
-        }
+          return state
 
         default: {
           throw new Error(`Unhandled action type: ${action.type}`)
@@ -114,6 +154,6 @@ function useAdvanceMortgageCalculator() {
   return context
 }
 
-const updateAdvanceForm = (field, data, dispatch) => dispatch({type: 'UPDATE_ADVANCE_FORM', field, data})
+const updateAdvanceForm = (form, dispatch) => dispatch({type: 'UPDATE_ADVANCE_FORM', form})
 
 export {AdvanceMortgageCalculatorProvider, useAdvanceMortgageCalculator, updateAdvanceForm}
