@@ -3,25 +3,8 @@ import React, {createContext, useReducer, useContext} from 'react'
 const AdvanceMortgageCalculator = createContext()
 
 const preCalculateMonthlyPaymentRaw = data => {
-  const copiedData = {...data}
-  let {mortgageAmount, interest, loanTerm} = copiedData
-
-  const p = Number(mortgageAmount)
-  const r = Number(interest) / 100 / 12 // 12 months per year, monthly interest
-  const n = loanTerm * 12 // months to be paid
-
+  let {mortgageAmount: p, interest: r, loanTerm: n} = data
   return (p * r) / (1 - Math.pow(1 + r, n * -1))
-}
-
-const newStateWithMonthlyPaymentRaw = (state, action) => {
-  const newState = {
-    ...state,
-    basic: {...state.basic, [action.field]: action.data},
-  }
-
-  const monthlyPaymentRaw = preCalculateMonthlyPaymentRaw(newState.basic)
-
-  return {...newState, basic: {...newState.basic, monthlyPaymentRaw}}
 }
 
 export const FORM_INITIAL_STATE = {
@@ -37,7 +20,7 @@ export const FORM_INITIAL_STATE = {
     true: '360',
     false: '30',
     value: '30',
-    year: true,
+    year: false,
   },
   interest: '5.00',
   pmi: {
@@ -58,7 +41,7 @@ export const FORM_INITIAL_STATE = {
     value: '1500',
     percent: false,
   },
-  hoaFess: '0',
+  hoaFees: '0',
   paymentFrequency: 'Monthly',
   startDate: new Date(),
   oneTime: {
@@ -86,11 +69,11 @@ export const FORM_INITIAL_STATE = {
 }
 
 export const INITIAL_STATE = {
-  homeValue: '300000',
+  homeValue: 300000,
   downPayment: 45000,
   mortgageAmount: 255000,
-  loanTerm: 30,
-  interest: '5.00',
+  loanTerm: 360,
+  interest: 5.0,
   pmi: 1275,
   propertyTax: 3000,
   homeInsurance: 1500,
@@ -114,24 +97,66 @@ export const INITIAL_STATE = {
     startDate: new Date(),
   },
 
-  monthlyPaymentRaw: 0,
+  monthlyPaymentRaw: preCalculateMonthlyPaymentRaw({mortgageAmount: 255000, interest: 5 / 100 / 12, loanTerm: 360}),
 }
 
 function AdvanceMortgageCalculatorProvider(props) {
   const [state, dispatch] = useReducer(
     (state, action) => {
       switch (action.type) {
-        case 'UPDATE_ADVANCE_FORM':
-          {
-            // console.log(action.form)
-            // if (action.field === 'startDate' || action.field === 'loanTerm') {
-            //   return newStateWithMonthlyPaymentRaw(state, action)
-            // }
-            // action.data = action.data.replace(/\,/g, '') // remove all comma
-            // return newStateWithMonthlyPaymentRaw(state, action)
-          }
+        case 'UPDATE_ADVANCE_FORM': {
+          let {
+            homeValue,
+            mortgageAmount,
+            interest,
+            loanTerm: lt,
+            paymentFrequency,
+            monthlyOrBiWeekly,
+            propertyTax: pt,
+            homeInsurance: hi,
+            pmi,
+            hoaFees,
+            startDate,
+            oneTime,
+            quarterly,
+            yearly,
+          } = action.form
 
-          return state
+          loanTerm = lt.year ? lt.false * 12 : lt.true
+          propertyTax = pt.percent ? (pt.true / 100) * homeValue : pt.false
+          homeInsurance = hi.percent ? (hi.true / 100) * homeValue : hi.false
+          pmi = pmi.percent ? (pmi.true / 100) * mortgageAmount : hi.false
+
+          oneTime = Number(oneTime.payment)
+          quarterly = Number(oneTime.quarterly)
+          yearly = Number(oneTime.yearly)
+          mortgageAmount = Number(mortgageAmount)
+          interest = Number((interest /= 1200)) // 12 months per year, monthly interest
+          loanTerm = Number(loanTerm)
+          hoaFees = Number(hoaFees)
+          monthlyOrBiWeekly = {...monthlyOrBiWeekly, payment: Number(monthlyOrBiWeekly.payment)}
+
+          const monthlyPaymentRaw = preCalculateMonthlyPaymentRaw({mortgageAmount, loanTerm, interest})
+
+          return {
+            advance: {
+              homeValue,
+              monthlyPaymentRaw,
+              loanTerm,
+              mortgageAmount,
+              paymentFrequency,
+              monthlyOrBiWeekly,
+              propertyTax,
+              homeInsurance,
+              pmi,
+              hoaFees,
+              startDate,
+              oneTime,
+              quarterly,
+              yearly,
+            },
+          }
+        }
 
         default: {
           throw new Error(`Unhandled action type: ${action.type}`)
@@ -149,7 +174,7 @@ function AdvanceMortgageCalculatorProvider(props) {
 function useAdvanceMortgageCalculator() {
   const context = useContext(AdvanceMortgageCalculator)
   if (context === undefined) {
-    throw new Error(`useBasicMortgageCalculator must be used within a BasicMortgageCalculator`)
+    throw new Error(`useAdvanceMortgageCalculator must be used within a AdvanceMortgageCalculator`)
   }
   return context
 }

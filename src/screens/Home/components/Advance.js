@@ -15,6 +15,24 @@ import Switch from './Switch'
 import fontFamily from '../../../styles/fontFamily'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 
+const calculateMortgageAmoit = state => {
+  let {homeValue, downPayment} = state
+
+  let {value: percent, percent: isPercent} = downPayment
+  homeValue = Number(homeValue.replace(/\,/g, ''))
+  let dp
+
+  if (isPercent) {
+    percent /= 100
+    mortgageAmount = homeValue - homeValue * percent
+  } else {
+    percent = Number(percent.replace(/\,/g, ''))
+    mortgageAmount = homeValue - percent
+  }
+
+  return {mortgageAmount, homeValue}
+}
+
 export default function Home() {
   const [, dispatch] = useAdvanceMortgageCalculator()
 
@@ -60,38 +78,35 @@ export default function Home() {
 
   // Function that update the input state and global input
   const handleChange = (key, value) => {
-    const newInputState = {...input, [key]: value}
+    let newInputState = {...input, [key]: value}
 
     // calculate new mortgage
-    let {homeValue, downPayment} = newInputState
-    let mortgageAmount
-    let {value: percent, percent: isPercent} = downPayment
-    homeValue = Number(homeValue.replace(/\,/g, ''))
-    percent = Number(percent)
-
-    if (isPercent) {
-      percent /= 100
-      mortgageAmount = homeValue - homeValue * percent
-    } else {
-      mortgageAmount = homeValue - percent
-    }
+    let {mortgageAmount, homeValue} = calculateMortgageAmoit(newInputState)
 
     setInput({...newInputState, mortgageAmount})
-    onChangeHandler(newInputState, dispatch)
+    onChangeHandler({...newInputState, mortgageAmount, homeValue}, dispatch)
   }
 
   const handleInputSwitchOnPress = (setState, key, type) => () => {
     setState(previousState => {
       const newState = !previousState
 
-      setInput({
+      const newInputState = {
         ...input,
         [key]: {
           ...input[key],
           value: input[key][newState],
-          [type]: !input[key][type],
+          [type]: newState,
         },
-      })
+      }
+
+      if (key === 'downPayment') {
+        // re-calculate new mortgage
+        let {mortgageAmount, homeValue} = calculateMortgageAmoit(newInputState)
+        onChangeHandler({...newInputState, mortgageAmount, homeValue}, dispatch)
+      }
+
+      setInput(newInputState)
       return newState
     })
   }
@@ -179,7 +194,7 @@ export default function Home() {
                   onPress={handleInputSwitchOnPress(setPdForTermLength, 'loanTerm', 'year')}
                 />
               }
-              value={handleInputValue(pdForTermLength, 'loanTerm', false)}
+              value={handleInputValue(pdForTermLength, 'loanTerm')}
               onChangeText={value => handleInputOnChangeTextWithSwitch('loanTerm', value, pdForTermLength)}
             />
 
@@ -195,7 +210,7 @@ export default function Home() {
             <TextInput
               label="PMI (Yearly)"
               keyboardType="decimal-pad"
-              reverse
+              reverse={pdForPMI}
               optionSwitch={
                 <Switch value={pdForPMI} onPress={handleInputSwitchOnPress(setPdForPMI, 'pmi', 'percent')} />
               }
@@ -207,7 +222,7 @@ export default function Home() {
             <TextInput
               label="Property Tax (Yearly)"
               keyboardType="decimal-pad"
-              reverse
+              reverse={pdForPropertyTax}
               optionSwitch={
                 <Switch
                   value={pdForPropertyTax}
@@ -222,7 +237,7 @@ export default function Home() {
             <TextInput
               label="Home Insurance (Yearly)"
               keyboardType="decimal-pad"
-              reverse
+              reverse={pdForHomeInsurance}
               optionSwitch={
                 <Switch
                   value={pdForHomeInsurance}
@@ -235,11 +250,11 @@ export default function Home() {
             />
 
             <TextInput
-              value={numbro(input.hoaFess).format({thousandSeparated: true})}
+              value={numbro(input.hoaFees).format({thousandSeparated: true})}
               label="HOA Fees (Monthly)"
               keyboardType="decimal-pad"
               icon={handleInputIncon(0)}
-              onChangeText={value => handleInputChange('hoaFess', value)}
+              onChangeText={value => handleInputChange('hoaFees', value)}
             />
 
             <LoanTerm
