@@ -57,13 +57,18 @@ export default function Home() {
     Keyboard.dismiss()
 
     if (inputWithDate !== 'startDate') {
-      setInput({
+      let newInputState = {
         ...input,
+
         [inputWithDate]: {
           ...input[inputWithDate],
           startDate: date,
         },
-      })
+      }
+
+      newInputState = {...newInputState, homeValue: Number(input.homeValue.replace(/\,/g, ''))}
+      setInput(newInputState)
+      onChangeHandler(newInputState, dispatch)
     } else {
       handleChange('startDate', date)
     }
@@ -149,7 +154,6 @@ export default function Home() {
     })
   }
 
-  // console.log(input.downPayment)
   return (
     <ScrollView>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>

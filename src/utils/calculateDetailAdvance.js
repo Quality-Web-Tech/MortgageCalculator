@@ -1,5 +1,4 @@
-import getOneTimeInterest from '../utils/calculateOneTimePayment'
-import getBiWeeklyInterest from '../utils/calculateBiWeeklyPayment'
+import calculateExtraPaymentsAndInterest from './calculateExtraPaymentAndInterest'
 import moment from 'moment'
 
 // P[r(1+r)^n/((1+r)^n)-1)]
@@ -33,12 +32,8 @@ export default data => {
       ? {type: paymentFrequency, amount: Number(fixedMonthlyPayment).toFixed(2)}
       : {type: paymentFrequency, amount: Number(fixedMonthlyPayment / 2).toFixed(2)}
 
-  // toFixed is the smalll deffirence here
   r = Number(r)
-  const monthlyOrBiWeeklyPayment = Number(monthlyOrBiWeekly.payment.toFixed(2))
-  const oneTimePayment = Number(oneTime.payment).toFixed(2)
-  const quarterlyPayment = Number(quarterly.payment).toFixed(2)
-  const yearlyPayment = Number(yearly.payment).toFixed(2)
+  const monthlyOrBiWeeklyPayment = Number(monthlyOrBiWeekly.payment)
   propertyTax = paymentFrequency.type === 'Monthly' ? propertyTax / 12 : propertyTax / 12 / 2
   homeInsurance = paymentFrequency.type === 'Monthly' ? homeInsurance / 12 : homeInsurance / 12 / 2
   pmi = paymentFrequency.type === 'Monthly' ? pmi / 12 : pmi / 12 / 2
@@ -48,45 +43,25 @@ export default data => {
   const totalPaymentMonthly =
     Number(paymentFrequency.amount) + monthlyOrBiWeeklyPayment + propertyTax + homeInsurance + pmi + hoaFees
 
-  const extraPaymentOnetime = Number(oneTimePayment) // total month
-  const extraPaymentMonthly = Number(monthlyOrBiWeeklyPayment * loanTerm.months)
-  const extraPaymentQuarterly = Number(quarterlyPayment * 4 * loanTerm.years) // 4 quarter in a year * total year
-  const extraPaymentYear = Number(yearlyPayment * loanTerm.years)
-
-  const totalExtraPayment = extraPaymentOnetime + extraPaymentMonthly + extraPaymentQuarterly + extraPaymentYear
-  const principal = p - totalExtraPayment
-
-  // numberOfPayments is undefined when form input is updated ba
-  const totalMortgage = monthlyPaymentRaw * loanTerm.months
-  const totalInterest = totalMortgage - p
-
-  // console.log(typeof r)
-  // const principalPerDay = Number(paymentFrequency.amount) - interestPerMonth
-  // const others = monthlyOrBiWeekly + propertyTax + homeInsurance + pmi + hoaFees
-  // const calculateOneTimeInterest = getOneTimeInterest(oneTime)
-
-  const oneTimeExtraPaymentInterest = getOneTimeInterest(
-    Number(paymentFrequency.amount),
+  const totalExtraPaymentAndInterest = calculateExtraPaymentsAndInterest(
+    paymentFrequency,
     p,
     r,
     loanTerm.months,
     oneTime,
+    monthlyOrBiWeekly,
+    quarterly,
+    yearly,
+    monthlyPaymentRaw * loanTerm.months - p,
   )
 
-  const biWeeklyExtraPaymentInterest = getBiWeeklyInterest(Number(paymentFrequency.amount), p, r, loanTerm.months, {
-    ...monthlyOrBiWeekly,
-    payment: 100,
-  })
-
-  // console.log(biWeeklyExtraPaymentInterest)
-
   const downPayment = (homeValue - p).toFixed(2)
-  const totalTax = propertyTax * 360
-  const totalInsurance = homeInsurance * 360
-  const totalPMI = pmi * 45 // Default value is 48 months or 4 years. In the actual app the default is 45 months
-  const totalFees = totalTax + totalInsurance + totalPMI + totalExtraPayment
+  const totalTax = propertyTax * totalExtraPaymentAndInterest.months
+  const totalInsurance = homeInsurance * totalExtraPaymentAndInterest.months
+  const totalPMI = pmi * 45 // Default value is 44 months. In the actual app the default is 44 months
+  const totalFees = totalTax + totalInsurance + totalPMI
 
-  const totalAllPayments = totalFees + totalInterest + p + Number(downPayment)
+  const totalAllPayments = totalFees + totalExtraPaymentAndInterest.totalInterest + p + Number(downPayment)
 
   return {
     ...data,
@@ -101,9 +76,9 @@ export default data => {
     numberOfPayments: loanTerm.months || numberOfPayments, // initial num payments is 360
     endDate,
     downPayment,
-    totalExtraPayment: totalExtraPayment.toFixed(2),
-    principal: principal.toFixed(2),
-    totalInterest: oneTimeExtraPaymentInterest.toFixed(2) || totalInterest.toFixed(2),
+    totalExtraPayment: totalExtraPaymentAndInterest.totalExtraPayment.toFixed(2),
+    principal: (p - totalExtraPaymentAndInterest.totalExtraPayment).toFixed(2),
+    totalInterest: totalExtraPaymentAndInterest.totalInterest.toFixed(2),
     totalFees,
     totalAllPayments: totalAllPayments.toFixed(2),
   }
