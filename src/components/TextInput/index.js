@@ -38,6 +38,7 @@ const TextInput = ({clickable, inputStyle, inputPressableStyle, ...props}) => {
   return (
     <TextInputContainer {...props}>
       {clickable ? (
+        // This component is for oppening a calendar input
         <Pressable style={[styles.textInput, {justifyContent: 'center'}]} onBlur={Keyboard.dismiss} {...props}>
           <Text style={[styles.textInputLabel, {fontSize: 18, color: colors.gray600}, inputPressableStyle]}>
             {props.value}

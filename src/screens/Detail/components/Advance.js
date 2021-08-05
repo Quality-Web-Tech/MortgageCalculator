@@ -25,19 +25,18 @@ function Detail() {
     startDate,
     endDate,
     downPayment,
-    // totalExtraPayment,
-    // principal,
-    // totalFees,
-    // totalAllPayments,
-    // totalInterest,
+    totalExtraPayment,
+    principal,
+    totalFees,
+    totalAllPayments,
+    totalInterest,
   } = calculateDetail({...advance})
 
-  // console.log(monthlyOrBiWeeklyExtraPayment)
   return (
     <Container>
       <ScrollView>
         <TextInput
-          label="Mortgage Amount"
+          label="Home Value"
           editable={false}
           value={formatNumber(homeValue)}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
@@ -125,7 +124,7 @@ function Detail() {
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         />
 
-        {/* <TextInput
+        <TextInput
           label="Principal"
           editable={false}
           value={formatNumber(principal)}
@@ -158,7 +157,7 @@ function Detail() {
           editable={false}
           value={formatNumber(totalAllPayments)}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
-        /> */}
+        />
       </ScrollView>
     </Container>
   )

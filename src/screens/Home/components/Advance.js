@@ -20,7 +20,6 @@ const calculateMortgageAmoit = state => {
 
   let {value: percent, percent: isPercent} = downPayment
   homeValue = Number(homeValue.replace(/\,/g, ''))
-  let dp
 
   if (isPercent) {
     percent /= 100
@@ -84,6 +83,7 @@ export default function Home() {
     let {mortgageAmount, homeValue} = calculateMortgageAmoit(newInputState)
 
     setInput({...newInputState, mortgageAmount})
+    // calling this it re-renders
     onChangeHandler({...newInputState, mortgageAmount, homeValue}, dispatch)
   }
 
@@ -100,13 +100,14 @@ export default function Home() {
         },
       }
 
+      let {mortgageAmount, homeValue} = calculateMortgageAmoit(newInputState)
       if (key === 'downPayment') {
         // re-calculate new mortgage
-        let {mortgageAmount, homeValue} = calculateMortgageAmoit(newInputState)
+        // need this for all switches
         onChangeHandler({...newInputState, mortgageAmount, homeValue}, dispatch)
       }
 
-      setInput(newInputState)
+      setInput({...newInputState, mortgageAmount})
       return newState
     })
   }
@@ -148,6 +149,7 @@ export default function Home() {
     })
   }
 
+  // console.log(input.downPayment)
   return (
     <ScrollView>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>

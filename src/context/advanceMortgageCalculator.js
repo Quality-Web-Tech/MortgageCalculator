@@ -72,13 +72,17 @@ export const INITIAL_STATE = {
   homeValue: 300000,
   downPayment: 45000,
   mortgageAmount: 255000,
-  loanTerm: 360,
+  loanTerm: {
+    years: 30,
+    months: 360,
+  },
   interest: 5.0,
   pmi: 1275,
   propertyTax: 3000,
   homeInsurance: 1500,
   hoaFees: 0,
   paymentFrequency: 'Monthly',
+  numberOfPayments: 360,
   startDate: new Date(),
   oneTime: {
     payment: 0,
@@ -122,21 +126,25 @@ function AdvanceMortgageCalculatorProvider(props) {
             yearly,
           } = action.form
 
-          loanTerm = lt.year ? lt.false * 12 : lt.true
+          mortgageAmount = Number(mortgageAmount)
+          const interestForRaw = Number(interest / 100 / 12) // 12 months per year, monthly interest
+          hoaFees = Number(hoaFees)
+
+          const loanTerm = {
+            years: Number(lt.year ? lt.true / 12 : lt.false),
+            months: Number(lt.year ? lt.true : lt.false * 12),
+          }
+
           propertyTax = pt.percent ? (pt.true / 100) * homeValue : pt.false
           homeInsurance = hi.percent ? (hi.true / 100) * homeValue : hi.false
-          pmi = pmi.percent ? (pmi.true / 100) * mortgageAmount : hi.false
-
-          oneTime = Number(oneTime.payment)
-          quarterly = Number(oneTime.quarterly)
-          yearly = Number(oneTime.yearly)
-          mortgageAmount = Number(mortgageAmount)
-          interest = Number((interest /= 1200)) // 12 months per year, monthly interest
-          loanTerm = Number(loanTerm)
-          hoaFees = Number(hoaFees)
+          pmi = pmi.percent ? (pmi.true / 100) * mortgageAmount : pmi.false
           monthlyOrBiWeekly = {...monthlyOrBiWeekly, payment: Number(monthlyOrBiWeekly.payment)}
 
-          const monthlyPaymentRaw = preCalculateMonthlyPaymentRaw({mortgageAmount, loanTerm, interest})
+          const monthlyPaymentRaw = preCalculateMonthlyPaymentRaw({
+            mortgageAmount,
+            loanTerm: loanTerm.months,
+            interest: interestForRaw,
+          })
 
           return {
             advance: {
@@ -154,6 +162,7 @@ function AdvanceMortgageCalculatorProvider(props) {
               oneTime,
               quarterly,
               yearly,
+              interest,
             },
           }
         }
