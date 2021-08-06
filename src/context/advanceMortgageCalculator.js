@@ -118,11 +118,29 @@ export const NEW_FORM_INITIAL_STATE = {
   propertyTax: '3000.00',
   homeInsurance: '1500.00',
   hoaFees: '0.00',
-  // monthlyPaymentRaw: preCalculateMonthlyPaymentRaw({
-  //   mortgageAmount: '100000',
-  //   interest: '2.00',
-  //   loanTerm: 30,
-  // }),
+  paymentFrequency: 'Monthly',
+  startDate: new Date(),
+  oneTime: {
+    payment: '0.00',
+    startDate: new Date(),
+  },
+  monthlyOrBiWeekly: {
+    payment: '0.00',
+    startDate: new Date(),
+  },
+  quarterly: {
+    payment: '0.00',
+    startDate: new Date(),
+  },
+  yearly: {
+    payment: '0.00',
+    startDate: new Date(),
+  },
+  monthlyPaymentRaw: preCalculateMonthlyPaymentRaw({
+    mortgageAmount: 300000,
+    interest: 5,
+    loanTerm: 360,
+  }),
 }
 
 function AdvanceMortgageCalculatorProvider(props) {
@@ -140,28 +158,30 @@ function AdvanceMortgageCalculatorProvider(props) {
             propertyTax,
             homeInsurance,
             hoaFees,
-            // paymentFrequency,
-            // monthlyOrBiWeekly,
-            // startDate,
-            // oneTime,
-            // quarterly,
-            // yearly,
+            paymentFrequency,
+            startDate,
+            oneTime,
+            monthlyOrBiWeekly,
+            quarterly,
+            yearly,
           } = action.form
 
-          // console.log(typeof homeValue, homeValue)
-          // console.log(typeof downPayment, downPayment)
-          // console.log(typeof mortgageAmount, mortgageAmount)
-          // console.log(typeof loanTerm, loanTerm)
-          // console.log(typeof interest, interest)
-          // console.log(typeof pmi, pmi)
-          // console.log(typeof propertyTax, propertyTax)
-          // console.log(typeof homeInsurance, homeInsurance)
-          console.log(typeof hoaFees, hoaFees)
+          interest = Number(interest)
+          hoaFees = Number(hoaFees)
+          yearly = {...yearly, payment: Number(yearly.payment)}
+          quarterly = {...quarterly, payment: Number(quarterly.payment)}
+          monthlyOrBiWeekly = {...monthlyOrBiWeekly, payment: Number(monthlyOrBiWeekly.payment)}
+          oneTime = {...oneTime, payment: Number(oneTime.payment)}
+          const interestForRaw = Number(interest / 100 / 12) // 12 months per year, monthly interest
+          const monthlyPaymentRaw = preCalculateMonthlyPaymentRaw({
+            mortgageAmount,
+            loanTerm: loanTerm.months,
+            interest: interestForRaw,
+          })
 
           // console.log(typeof downPayment)
           // console.log(homeValue, downPayment)
           // mortgageAmount = Number(mortgageAmount)
-          // const interestForRaw = Number(interest / 100 / 12) // 12 months per year, monthly interest
           // hoaFees = Number(hoaFees)
 
           // const loanTerm = {
@@ -174,12 +194,6 @@ function AdvanceMortgageCalculatorProvider(props) {
           // pmi = pmi.percent ? (pmi.true / 100) * mortgageAmount : pmi.false
           // monthlyOrBiWeekly = {...monthlyOrBiWeekly, payment: Number(monthlyOrBiWeekly.payment)}
 
-          // const monthlyPaymentRaw = preCalculateMonthlyPaymentRaw({
-          //   mortgageAmount,
-          //   loanTerm: loanTerm.months,
-          //   interest: interestForRaw,
-          // })
-
           return {
             ...state,
             advance: {
@@ -191,14 +205,14 @@ function AdvanceMortgageCalculatorProvider(props) {
               pmi,
               propertyTax,
               homeInsurance,
-              // monthlyPaymentRaw,
-              // paymentFrequency,
-              // monthlyOrBiWeekly,
-              // hoaFees,
-              // startDate,
-              // oneTime,
-              // quarterly,
-              // yearly,
+              hoaFees,
+              paymentFrequency,
+              startDate,
+              oneTime,
+              quarterly,
+              monthlyOrBiWeekly,
+              yearly,
+              monthlyPaymentRaw,
             },
           }
         }

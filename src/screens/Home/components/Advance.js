@@ -7,7 +7,7 @@ import {Container, TextInput} from 'components'
 import LoanTerm from './LoanTerm'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
 import {useAdvanceMortgageCalculator, updateAdvanceForm} from '../../../context/advanceMortgageCalculator'
-import {formatDate} from '../../../utils/formatter'
+import {formatDate, formatNumber} from '../../../utils/formatter'
 import {NEW_FORM_INITIAL_STATE} from '../../../context/advanceMortgageCalculator'
 import {debounce} from 'lodash/fp'
 import numbro from 'numbro'
@@ -97,44 +97,41 @@ export default function Home() {
 
   // const [input, setInput] = useState(NEW_FORM_INITIAL_STATE)
   const [form, setForm] = useState(NEW_FORM_INITIAL_STATE)
-  // const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
+  const [inputWithDate, setInputWithDate] = useState()
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
+
   // const [pdForDownPayment, setPdForDownPayment] = useState(true)
   // const [pdForTermLength, setPdForTermLength] = useState(false)
   // const [pdForPMI, setPdForPMI] = useState(true)
   // const [pdForPropertyTax, setPdForPropertyTax] = useState(false)
   // const [pdForHomeInsurance, setPdForHomeInsurance] = useState(false)
-  // const [inputWithDate, setInputWithDate] = useState()
 
-  // const showDatePicker = key => {
-  //   setInputWithDate(key)
-  //   setDatePickerVisibility(true)
-  // }
+  const showDatePicker = key => {
+    setInputWithDate(key)
+    setDatePickerVisibility(true)
+  }
 
-  // const hideDatePicker = () => {
-  //   setDatePickerVisibility(false)
-  // }
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false)
+  }
 
-  // const handleConfirm = date => {
-  //   Keyboard.dismiss()
+  const handleConfirm = date => {
+    Keyboard.dismiss()
 
-  //   if (inputWithDate !== 'startDate') {
-  //     let newInputState = {
-  //       ...input,
+    if (inputWithDate !== 'startDate') {
+      let newInputState = {
+        [inputWithDate]: {
+          ...form[inputWithDate],
+          startDate: date,
+        },
+      }
 
-  //       [inputWithDate]: {
-  //         ...input[inputWithDate],
-  //         startDate: date,
-  //       },
-  //     }
-
-  //     newInputState = {...newInputState, homeValue: Number(input.homeValue.replace(/\,/g, ''))}
-  //     setInput(newInputState)
-  //     onChangeHandler(newInputState, dispatch)
-  //   } else {
-  //     handleChange('startDate', date)
-  //   }
-  //   hideDatePicker()
-  // }
+      handleOnChangeText(newInputState)
+    } else {
+      handleOnChangeText({startDate: date})
+    }
+    hideDatePicker()
+  }
 
   // const onChangeHandler = React.useCallback(
   //   debounce(400, (...args) => updateAdvanceForm(...args)),
@@ -212,11 +209,11 @@ export default function Home() {
 
   const handleOnChangeText = newdata => {
     const newState = {...form, ...newdata}
-    // console.log(newState)
     setForm(newState)
     onChangeHandler(newState, dispatch)
   }
 
+  // console.log(form)
   return (
     <ScrollView>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -312,7 +309,7 @@ export default function Home() {
               label="Interest Rate"
               keyboardType="decimal-pad"
               icon={handleInputIncon(1)}
-              onChangeText={interest => handleOnChangeText({interest: Number(interest)})}
+              onChangeText={interest => handleOnChangeText({interest: interest})}
             />
 
             <InputSwitch
@@ -379,22 +376,26 @@ export default function Home() {
               icon={handleInputIncon(null)}
               onChangeText={value => {
                 handleOnChangeText({
-                  hoaFees: Number(value),
+                  hoaFees: value,
                 })
               }}
             />
 
-            {/*<LoanTerm
-              value={input.paymentFrequency}
+            <LoanTerm
+              value={form.paymentFrequency}
               leftLabel="Payment Frequency"
               data={['Monthly', 'Bi-Weekly']}
-              onChange={value => handleInputChange('paymentFrequency', value)}
+              onChange={value =>
+                handleOnChangeText({
+                  paymentFrequency: value,
+                })
+              }
             />
 
             <TextInput
               reverse
               clickable={true}
-              value={formatDate(input.startDate)}
+              value={formatDate(form.startDate)}
               label="Start Date"
               icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
               onPress={() => showDatePicker('startDate')}
@@ -407,11 +408,11 @@ export default function Home() {
             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <TextInput
                 containerStyle={{width: '45%'}}
-                value={numbro(input.oneTime.payment).format({thousandSeparated: true})}
+                value={formatNumber(form.oneTime.payment)}
                 label="One Time"
                 keyboardType="decimal-pad"
                 icon={handleInputIncon(0)}
-                onChangeText={value => handleExtraPaymentInput('oneTime', value)}
+                onChangeText={value => handleOnChangeText({oneTime: {...form.oneTime, payment: value}})}
               />
 
               <TextInput
@@ -419,7 +420,7 @@ export default function Home() {
                 inputPressableStyle={{fontSize: 12}}
                 reverse
                 clickable={true}
-                value={formatDate(input.oneTime.startDate)}
+                value={formatDate(form.oneTime.startDate)}
                 label="On"
                 icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
                 onPress={() => showDatePicker('oneTime')}
@@ -429,19 +430,22 @@ export default function Home() {
             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <TextInput
                 containerStyle={{width: '45%'}}
-                value={numbro(input.monthlyOrBiWeekly.payment).format({thousandSeparated: true})}
+                value={formatNumber(form.monthlyOrBiWeekly.payment)}
                 label="Monthly or Bi-Weekly"
                 keyboardType="decimal-pad"
                 icon={handleInputIncon(0)}
-                onChangeText={value => handleExtraPaymentInput('monthlyOrBiWeekly', value)}
+                onChangeText={value =>
+                  handleOnChangeText({monthlyOrBiWeekly: {...form.monthlyOrBiWeekly, payment: value}})
+                }
               />
+
               <TextInput
                 containerStyle={{width: '45%'}}
                 inputPressableStyle={{fontSize: 12}}
                 reverse
                 clickable={true}
-                value={formatDate(input.monthlyOrBiWeekly.startDate)}
-                label="On"
+                value={formatDate(form.monthlyOrBiWeekly.startDate)}
+                label="Starting"
                 icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
                 onPress={() => showDatePicker('monthlyOrBiWeekly')}
               />
@@ -450,19 +454,19 @@ export default function Home() {
             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <TextInput
                 containerStyle={{width: '45%'}}
-                value={numbro(input.quarterly.payment).format({thousandSeparated: true})}
+                value={formatNumber(form.quarterly.payment)}
                 label="Quarterly"
                 keyboardType="decimal-pad"
                 icon={handleInputIncon(0)}
-                onChangeText={value => handleExtraPaymentInput('quarterly', value)}
+                onChangeText={value => handleOnChangeText({quarterly: {...form.quarterly, payment: value}})}
               />
               <TextInput
                 containerStyle={{width: '45%'}}
                 inputPressableStyle={{fontSize: 12}}
                 reverse
                 clickable={true}
-                value={formatDate(input.quarterly.startDate)}
-                label="On"
+                value={formatDate(form.quarterly.startDate)}
+                label="Starting"
                 icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
                 onPress={() => showDatePicker('quarterly')}
               />
@@ -471,18 +475,22 @@ export default function Home() {
             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <TextInput
                 containerStyle={{width: '45%'}}
-                value={numbro(input.yearly.payment).format({thousandSeparated: true})}
+                value={formatNumber(form.yearly.payment)}
                 label="Yearly"
                 keyboardType="decimal-pad"
                 icon={handleInputIncon(0)}
-                onChangeText={value => handleExtraPaymentInput('yearly', value)}
+                onChangeText={value =>
+                  handleOnChangeText({
+                    yearly: {...form.yearly, payment: value},
+                  })
+                }
               />
               <TextInput
                 containerStyle={{width: '45%'}}
                 inputPressableStyle={{fontSize: 12}}
                 reverse
                 clickable={true}
-                value={formatDate(input.yearly.startDate)}
+                value={formatDate(form.yearly.startDate)}
                 label="On"
                 icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
                 onPress={() => showDatePicker('yearly')}
@@ -494,7 +502,7 @@ export default function Home() {
               mode="date"
               onConfirm={handleConfirm}
               onCancel={hideDatePicker}
-            /> */}
+            />
           </Container>
         </KeyboardAwareScrollView>
       </TouchableWithoutFeedback>
