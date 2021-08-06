@@ -34,7 +34,7 @@ const TextInputContainer = ({
   )
 }
 
-const TextInput = ({clickable, inputStyle, inputPressableStyle, ...props}) => {
+const TextInput = ({clickable, inputStyle, inputPressableStyle, onChangeText = () => null, ...props}) => {
   return (
     <TextInputContainer {...props}>
       {clickable ? (
@@ -45,7 +45,12 @@ const TextInput = ({clickable, inputStyle, inputPressableStyle, ...props}) => {
           </Text>
         </Pressable>
       ) : (
-        <NativeInput style={[styles.textInput, inputStyle]} onBlur={Keyboard.dismiss} {...props} />
+        <NativeInput
+          style={[styles.textInput, inputStyle]}
+          onBlur={Keyboard.dismiss}
+          {...props}
+          onChangeText={val => onChangeText(val)}
+        />
       )}
     </TextInputContainer>
   )

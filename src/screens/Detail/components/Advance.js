@@ -6,8 +6,9 @@ import variables from 'styles/variables'
 import {Container, TextInput} from 'components'
 import {useAdvanceMortgageCalculator} from 'context/advanceMortgageCalculator'
 import {formatDate, formatNumber} from 'utils/formatter'
-import calculateDetail from '../../../utils/calculateDetailAdvance'
+import calculateDetailAdvance from '../../../utils/calculateDetailAdvance'
 import moment from 'moment'
+import numbro from 'numbro'
 
 function Detail() {
   const [{advance}] = useAdvanceMortgageCalculator()
@@ -30,19 +31,20 @@ function Detail() {
     totalFees,
     totalAllPayments,
     totalInterest,
-  } = calculateDetail({...advance})
+  } = calculateDetailAdvance({...advance})
 
+  console.log(typeof homeValue)
   return (
     <Container>
       <ScrollView>
         <TextInput
           label="Home Value"
           editable={false}
-          value={formatNumber(homeValue)}
+          value={numbro(homeValue).format({thousandSeparated: true})}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         />
 
-        <TextInput
+        {/* <TextInput
           label="Mortgage Amount"
           editable={false}
           value={formatNumber(mortgageAmount)}
@@ -157,7 +159,7 @@ function Detail() {
           editable={false}
           value={formatNumber(totalAllPayments)}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
-        />
+        /> */}
       </ScrollView>
     </Container>
   )
