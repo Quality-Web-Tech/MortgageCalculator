@@ -5,7 +5,7 @@ import {MaterialIcons} from '@expo/vector-icons'
 import variables from 'styles/variables'
 import {Container, TextInput} from 'components'
 import {useAdvanceMortgageCalculator} from 'context/advanceMortgageCalculator'
-import {formatDate, formatNumber} from 'utils/formatter'
+import {formatDate} from 'utils/formatter'
 import calculateDetailAdvance from '../../../utils/calculateDetailAdvance'
 import moment from 'moment'
 import numbro from 'numbro'
@@ -33,75 +33,68 @@ function Detail() {
     totalInterest,
   } = calculateDetailAdvance({...advance})
 
-  console.log(typeof homeValue)
   return (
     <Container>
       <ScrollView>
         <TextInput
           label="Home Value"
           editable={false}
-          value={numbro(homeValue).format({thousandSeparated: true})}
+          value={numbro(homeValue).format({thousandSeparated: true, mantissa: 2})}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         />
-
-        {/* <TextInput
+        <TextInput
           label="Mortgage Amount"
           editable={false}
-          value={formatNumber(mortgageAmount)}
+          value={numbro(mortgageAmount).format({thousandSeparated: true, mantissa: 2})}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         />
-
         <TextInput
           label={`${paymentFrequency.type} Principal & Interest`}
           editable={false}
-          value={formatNumber(paymentFrequency.amount)}
+          value={numbro(paymentFrequency.amount).format({thousandSeparated: true, mantissa: 2})}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         />
-
         <TextInput
           label={`${paymentFrequency.type} Extra Payment`}
           editable={false}
-          value={formatNumber(monthlyOrBiWeeklyExtraPayment)}
+          value={numbro(monthlyOrBiWeeklyExtraPayment).format({thousandSeparated: true, mantissa: 2})}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         />
-
         <TextInput
           label={`${paymentFrequency.type} Property Tax`}
           editable={false}
-          value={formatNumber(propertyTax)}
+          value={numbro(propertyTax).format({thousandSeparated: true, mantissa: 2})}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         />
-
         <TextInput
           label={`${paymentFrequency.type} Home Insurance`}
           editable={false}
-          value={formatNumber(homeInsurance)}
+          value={numbro(homeInsurance).format({thousandSeparated: true, mantissa: 2})}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         />
-
         <TextInput
           label={`${paymentFrequency.type} PMI (Until ${moment(new Date()).add(44, 'months').format('MMM, YYYY')})`}
           editable={false}
-          value={formatNumber(pmi)}
+          value={numbro(pmi).format({thousandSeparated: true, mantissa: 2})}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         />
-
         <TextInput
           label={`${paymentFrequency.type} HOA Fees`}
           editable={false}
-          value={formatNumber(hoaFees)}
+          value={numbro(hoaFees).format({thousandSeparated: true, mantissa: 2})}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         />
-
         <TextInput
           label="Total Monthly Payment"
           editable={false}
-          value={formatNumber(totalPayment)}
+          value={numbro(totalPayment).format({thousandSeparated: true, mantissa: 2})}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         />
-
-        <TextInput label="Number Of Payments" editable={false} value={formatNumber(numberOfPayments)} />
-
+        <TextInput
+          label="Number Of Payments"
+          editable={false}
+          value={numbro(numberOfPayments).format({thousandSeparated: true})}
+        />
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <TextInput
             containerStyle={{width: '45%'}}
@@ -118,48 +111,42 @@ function Detail() {
             value={formatDate(endDate)}
           />
         </View>
-
         <TextInput
           label="Down Payment"
           editable={false}
-          value={formatNumber(downPayment)}
+          value={numbro(downPayment).format({thousandSeparated: true, mantissa: 2})}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         />
-
         <TextInput
           label="Principal"
           editable={false}
-          value={formatNumber(principal)}
+          value={numbro(principal).format({thousandSeparated: true, mantissa: 2})}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         />
-
         <TextInput
           label="Total Extra Payment"
           editable={false}
-          value={formatNumber(totalExtraPayment)}
+          value={numbro(totalExtraPayment).format({thousandSeparated: true, mantissa: 2})}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         />
-
         <TextInput
           label="Total Interest Paid"
           editable={false}
-          value={formatNumber(totalInterest)}
+          value={numbro(totalInterest).format({thousandSeparated: true, mantissa: 2})}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         />
-
         <TextInput
           label="Total Tax, Insurance, PMI & Fees"
           editable={false}
-          value={formatNumber(totalFees)}
+          value={numbro(totalFees).format({thousandSeparated: true, mantissa: 2})}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
         />
-
         <TextInput
           label="Total Of All Payments"
           editable={false}
-          value={formatNumber(totalAllPayments)}
+          value={numbro(totalAllPayments).format({thousandSeparated: true, mantissa: 2})}
           icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
-        /> */}
+        />
       </ScrollView>
     </Container>
   )

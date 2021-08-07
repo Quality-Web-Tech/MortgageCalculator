@@ -25,23 +25,6 @@ const handleInputIncon = state => {
   )
 }
 
-// const calculateMortgageAmoit = state => {
-//   let {homeValue, downPayment} = state
-
-//   let {value: percent, percent: isPercent} = downPayment
-//   homeValue = Number(homeValue.replace(/\,/g, ''))
-
-//   if (isPercent) {
-//     percent /= 100
-//     mortgageAmount = homeValue - homeValue * percent
-//   } else {
-//     percent = Number(percent.replace(/\,/g, ''))
-//     mortgageAmount = homeValue - percent
-//   }
-
-//   return {mortgageAmount, homeValue}
-// }
-
 const HDMInputSwitch = ({state, handleOnChangeText, children}) => {
   const [on, setOn] = useState(true)
   const [value, setValue] = useState(state)
@@ -61,9 +44,10 @@ const HDMInputSwitch = ({state, handleOnChangeText, children}) => {
           reverse: on,
           onToggle: toggle,
           icon: handleInputIncon(on),
-          value: on ? value[on] : numbro(value[on] || 0).format({thousandSeparated: true}),
+          value: on ? formatNumber(value[on]) : numbro(value[on] || 0).format({thousandSeparated: true}),
           onChangeText: val => {
             val = numbro.unformat(val)
+
             setValue({...value, [on]: val})
             return child.props.onChangeText(val, on, value, setValue)
           },
@@ -72,7 +56,7 @@ const HDMInputSwitch = ({state, handleOnChangeText, children}) => {
   })
 }
 
-const InputSwitch = ({initialState = true, term = false, state, children}) => {
+const InputSwitch = ({initialState = true, term = false, setter = () => null, state, children}) => {
   const [on, setOn] = useState(initialState)
   const [data, setData] = useState(state)
   const toggle = () => setOn(!on)
@@ -81,8 +65,17 @@ const InputSwitch = ({initialState = true, term = false, state, children}) => {
     return React.cloneElement(child, {
       reverse: on,
       icon: term ? null : handleInputIncon(on),
-      value: String(data[on]),
-      optionSwitch: <Switch term={term} value={on} onToggle={toggle} />,
+      value: formatNumber(data[on]),
+      optionSwitch: (
+        <Switch
+          term={term}
+          value={on}
+          onToggle={() => {
+            setter()
+            toggle()
+          }}
+        />
+      ),
       onChangeText: val => {
         const newState = {...data, [on]: val}
         setData(newState)
@@ -95,16 +88,9 @@ const InputSwitch = ({initialState = true, term = false, state, children}) => {
 export default function Home() {
   const [, dispatch] = useAdvanceMortgageCalculator()
 
-  // const [input, setInput] = useState(NEW_FORM_INITIAL_STATE)
   const [form, setForm] = useState(NEW_FORM_INITIAL_STATE)
   const [inputWithDate, setInputWithDate] = useState()
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
-
-  // const [pdForDownPayment, setPdForDownPayment] = useState(true)
-  // const [pdForTermLength, setPdForTermLength] = useState(false)
-  // const [pdForPMI, setPdForPMI] = useState(true)
-  // const [pdForPropertyTax, setPdForPropertyTax] = useState(false)
-  // const [pdForHomeInsurance, setPdForHomeInsurance] = useState(false)
 
   const showDatePicker = key => {
     setInputWithDate(key)
@@ -133,75 +119,6 @@ export default function Home() {
     hideDatePicker()
   }
 
-  // const onChangeHandler = React.useCallback(
-  //   debounce(400, (...args) => updateAdvanceForm(...args)),
-  //   [],
-  // )
-
-  // // Function that update the input state and global input
-  // const handleChange = (key, value) => {
-  //   let newInputState = {...input, [key]: value}
-
-  //   // calculate new mortgage
-  //   let {mortgageAmount, homeValue} = calculateMortgageAmoit(newInputState)
-
-  //   setInput({...newInputState, mortgageAmount})
-  //   // calling this it re-renders
-  //   onChangeHandler({...newInputState, mortgageAmount, homeValue}, dispatch)
-  // }
-
-  // const handleInputSwitchOnPress = (setState, key, type) => () => {
-  //   setState(previousState => {
-  //     const newState = !previousState
-
-  //     const newInputState = {
-  //       ...input,
-  //       [key]: {
-  //         ...input[key],
-  //         value: input[key][newState],
-  //         [type]: newState,
-  //       },
-  //     }
-
-  //     let {mortgageAmount, homeValue} = calculateMortgageAmoit(newInputState)
-  //     if (key === 'downPayment') {
-  //       // re-calculate new mortgage
-  //       // need this for all switches
-  //       onChangeHandler({...newInputState, mortgageAmount, homeValue}, dispatch)
-  //     }
-
-  //     setInput({...newInputState, mortgageAmount})
-  //     return newState
-  //   })
-  // }
-
-  // const handleExtraPaymentInput = (key, value) => {
-  //   if (!value) value = '0'
-
-  //   handleChange(`${key}`, {
-  //     ...input[key],
-  //     payment: value,
-  //   })
-  // }
-
-  // const handleInputValue = (state, key, thousandSeparated = true) =>
-  //   state ? input[key].value : numbro(input[key].value).format({thousandSeparated})
-
-  const handleInputChange = (key, value) => {
-    if (!value) value = '0'
-    handleChange(key, value)
-  }
-
-  // const handleInputOnChangeTextWithSwitch = (key, value, state) => {
-  //   if (!value) value = state && key !== 'loanTerm' ? '' : '0'
-
-  //   handleChange(`${key}`, {
-  //     ...input[key],
-  //     [state]: value,
-  //     value,
-  //   })
-  // }
-
   const onChangeHandler = React.useCallback(
     debounce(400, (...args) => updateAdvanceForm(...args)),
     [],
@@ -209,11 +126,11 @@ export default function Home() {
 
   const handleOnChangeText = newdata => {
     const newState = {...form, ...newdata}
+
     setForm(newState)
     onChangeHandler(newState, dispatch)
   }
 
-  // console.log(form)
   return (
     <ScrollView>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -225,6 +142,7 @@ export default function Home() {
                 const {homeValue} = form
                 const diff = on ? (value[on] / 100) * homeValue : value[on]
                 const mortgageAmount = homeValue - diff
+
                 handleOnChangeText({
                   mortgageAmount,
                 })
@@ -305,37 +223,50 @@ export default function Home() {
 
             <TextInput
               reverse
-              value={form.interest}
+              value={formatNumber(form.interest)}
               label="Interest Rate"
               keyboardType="decimal-pad"
               icon={handleInputIncon(1)}
               onChangeText={interest => handleOnChangeText({interest: interest})}
             />
 
-            <InputSwitch
-              term={false}
-              state={{
-                false: '1275.00',
-                true: '0.50',
-              }}
-            >
-              <TextInput
-                label="PMI (Yearly)"
-                keyboardType="decimal-pad"
-                onChangeText={(value, selected) => {
-                  const {false: dollar, true: percent} = value
-                  handleOnChangeText({
-                    pmi: Number(selected ? (percent / 100) * form.mortgageAmount : dollar),
-                  })
-                }}
-              />
-            </InputSwitch>
+            <TextInput
+              label="PMI (Yearly)"
+              keyboardType="decimal-pad"
+              reverse={form.pmi.isPercent}
+              optionSwitch={
+                <Switch
+                  value={form.pmi.isPercent}
+                  onToggle={() => {
+                    const {isPercent} = form.pmi
+                    handleOnChangeText({
+                      pmi: {
+                        ...form.pmi,
+                        isPercent: !isPercent,
+                        value: isPercent ? (form.pmi.true / 100) * form.mortgageAmount : form.pmi.true,
+                      },
+                    })
+                  }}
+                />
+              }
+              value={formatNumber(form.pmi.value)}
+              icon={handleInputIncon(form.pmi.isPercent)}
+              onChangeText={value =>
+                handleOnChangeText({
+                  pmi: {
+                    ...form.pmi,
+                    [form.pmi.isPercent]: value,
+                    value,
+                  },
+                })
+              }
+            />
 
             <InputSwitch
               initialState={false}
               state={{
-                false: '3000.00',
-                true: '1.00',
+                false: 3000,
+                true: 1,
               }}
             >
               <TextInput
@@ -344,7 +275,7 @@ export default function Home() {
                 onChangeText={(value, selected) => {
                   const {false: dollar, true: percent} = value
                   handleOnChangeText({
-                    propertyTax: Number(selected ? (percent / 100) * form.homeValue : dollar),
+                    propertyTax: selected ? (percent / 100) * form.homeValue : dollar,
                   })
                 }}
               />
@@ -353,8 +284,8 @@ export default function Home() {
             <InputSwitch
               initialState={false}
               state={{
-                false: '1500.00',
-                true: '0.50',
+                false: 1500,
+                true: 0.5,
               }}
             >
               <TextInput
@@ -363,14 +294,14 @@ export default function Home() {
                 onChangeText={(value, selected) => {
                   const {false: dollar, true: percent} = value
                   handleOnChangeText({
-                    homeInsurance: Number(selected ? (percent / 100) * form.homeValue : dollar),
+                    homeInsurance: selected ? (percent / 100) * form.homeValue : dollar,
                   })
                 }}
               />
             </InputSwitch>
 
             <TextInput
-              value={form.hoaFees}
+              value={formatNumber(form.hoaFees) || ''}
               label="HOA Fees (Monthly)"
               keyboardType="decimal-pad"
               icon={handleInputIncon(null)}
@@ -465,7 +396,7 @@ export default function Home() {
                 inputPressableStyle={{fontSize: 12}}
                 reverse
                 clickable={true}
-                value={formatDate(form.quarterly.startDate)}
+                value={formatDate(form.quarterly.startDate) || ''}
                 label="Starting"
                 icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
                 onPress={() => showDatePicker('quarterly')}
@@ -475,7 +406,7 @@ export default function Home() {
             <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <TextInput
                 containerStyle={{width: '45%'}}
-                value={formatNumber(form.yearly.payment)}
+                value={formatNumber(form.yearly.payment) || ''}
                 label="Yearly"
                 keyboardType="decimal-pad"
                 icon={handleInputIncon(0)}
@@ -490,7 +421,7 @@ export default function Home() {
                 inputPressableStyle={{fontSize: 12}}
                 reverse
                 clickable={true}
-                value={formatDate(form.yearly.startDate)}
+                value={formatDate(form.yearly.startDate) || ''}
                 label="On"
                 icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
                 onPress={() => showDatePicker('yearly')}

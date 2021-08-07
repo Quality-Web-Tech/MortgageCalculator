@@ -80,7 +80,7 @@ const getExtraPaymentsAndInterest = (
     n++
   }
 
-  return {totalInterest: totalInterest + 2.1, totalExtraPayment, months: n} // minor difference due to decimals places
+  return {totalInterest: totalInterest, totalExtraPayment, months: n} // minor difference due to decimals places
 }
 
 const getNewInterestPerMonth = (balance, interest, days = 30) => ((balance * interest) / 36000) * days // 100 - interest, 12 - months, 30 - days
