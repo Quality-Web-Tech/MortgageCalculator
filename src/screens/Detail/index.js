@@ -1,5 +1,5 @@
 import React from 'react'
-import {Keyboard, TouchableWithoutFeedback, Text} from 'react-native'
+import {Keyboard, TouchableWithoutFeedback} from 'react-native'
 import Basic from './components/Basic'
 import Advance from './components/Advance'
 
