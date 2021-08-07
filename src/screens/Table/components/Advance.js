@@ -8,20 +8,20 @@ import {Table, Row} from 'react-native-table-component'
 import numbro from 'numbro'
 
 const tableHead = ['DATE', 'INTEREST', 'PRINCIPAL', 'EXTRA', 'OTHERS', 'TOTAL', 'BALANCE']
-const widthArr = [60, 85, 90, 80, 80, 80, 80]
 
 function AdvanceTable() {
   const [{advance}] = useAdvanceMortgageCalculator()
+  const [term, setTerm] = React.useState('year')
   const {data} = calculateAdvanceMonthlyYearlyPayment(advance)
 
-  const [term, setTerm] = React.useState('year')
+  const widthArr = [term == 'year' ? 60 : 90, 85, 90, 80, 80, 80, 80]
   const tableData = []
-  for (let i = 0; i < data.year.length; i += 1) {
+  for (let i = 0; i < data[term].length; i += 1) {
     const rowData = []
-    for (let j = 0; j < data.year[i].length; j += 1) {
+    for (let j = 0; j < data[term][i].length; j += 1) {
       j === 0
-        ? rowData.push(data.year[i][j])
-        : rowData.push(`$${numbro(data.year[i][j]).format({thousandSeparated: true, mantissa: 2})}`)
+        ? rowData.push(data[term][i][j])
+        : rowData.push(`$${numbro(data[term][i][j]).format({thousandSeparated: true, mantissa: 2})}`)
     }
     tableData.push(rowData)
   }
