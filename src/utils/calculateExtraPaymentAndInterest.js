@@ -45,7 +45,7 @@ const getExtraPaymentsAndInterest = (
   let payments = 0
 
   while (n < months && balance >= 0) {
-    let newInterest = Number(getNewInterestPerMonth(balance, r).toFixed(2))
+    let newInterest = Number(getNewInterestPerMonth(balance, r))
     let principal = amount - newInterest
 
     if (diffMonthsForOneTime === n && oPayment) {
@@ -53,7 +53,7 @@ const getExtraPaymentsAndInterest = (
       payments += oPayment
     }
 
-    if (diffMonthsForBiWeekly <= n && bPayment && balance >= 100) {
+    if (diffMonthsForBiWeekly <= n && bPayment) {
       totalExtraPayment += bPayment
       payments += bPayment
     }
@@ -74,6 +74,10 @@ const getExtraPaymentsAndInterest = (
     } else {
       totalInterest += newInterest
       balance = balance - principal
+    }
+
+    if (balance < 0) {
+      totalExtraPayment += balance
     }
 
     payments = 0
