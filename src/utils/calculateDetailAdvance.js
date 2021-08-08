@@ -36,7 +36,6 @@ export default data => {
 
   const totalPaymentMonthly =
     paymentFrequency.amount + monthlyOrBiWeeklyPayment + propertyTax + homeInsurance + pmi + hoaFees
-  const endDate = moment(startDate).add(loanTerm.years, 'years')
   const downPayment = homeValue - mortgageAmount
 
   const totalExtraPaymentAndInterest = calculateExtraPaymentsAndInterest(
@@ -49,14 +48,18 @@ export default data => {
     quarterly,
     yearly,
     monthlyPaymentRaw * loanTerm.months - mortgageAmount,
+    monthlyPaymentRaw,
   )
 
   const principal = mortgageAmount - totalExtraPaymentAndInterest.totalExtraPayment
+  const endDate = moment(startDate).add(totalExtraPaymentAndInterest.months - 1, 'months')
 
   const totalTax = propertyTax * totalExtraPaymentAndInterest.months
   const totalInsurance = homeInsurance * totalExtraPaymentAndInterest.months
   const totalPMI = pmi * 45 // Default value is 44 months. In the actual app the default is 44 months
-  const totalFees = totalTax + totalInsurance + totalPMI + hoaFees * loanTerm.months
+  const totalHoaFees = hoaFees * totalExtraPaymentAndInterest.months
+  const totalFees = totalTax + totalInsurance + totalPMI + totalHoaFees
+
   const totalAllPayments = totalFees + totalExtraPaymentAndInterest.totalInterest + mortgageAmount + downPayment
 
   return {
@@ -68,7 +71,7 @@ export default data => {
     pmi,
     hoaFees,
     totalPayment: totalPaymentMonthly,
-    numberOfPayments: loanTerm.months,
+    numberOfPayments: totalExtraPaymentAndInterest.months, //fixed pay off date displayed use moment to get the date
     endDate,
     downPayment,
     principal,

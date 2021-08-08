@@ -10,6 +10,7 @@ const getExtraPaymentsAndInterest = (
   quarterly,
   yearly,
   defaultTotalInterest,
+  monthlyPaymentRaw,
 ) => {
   let {amount, type} = paymenFrequency
   let {payment: oPayment, startDate: oDate} = oneTime
@@ -43,50 +44,48 @@ const getExtraPaymentsAndInterest = (
   let balance = p // 255000
   let totalExtraPayment = 0
   let payments = 0
+  let interest = r / 1200
 
   while (n < months && balance >= 0) {
-    let newInterest = Number(getNewInterestPerMonth(balance, r))
-    let principal = amount - newInterest
+    let newInterest = balance * interest // interest based on balance
+    let principal = monthlyPaymentRaw - newInterest // principal that goes to balance
+
+    // break if we can pay balance
+    if (principal >= balance) {
+      totalInterest += newInterest
+
+      n += 1
+      break
+    }
 
     if (diffMonthsForOneTime === n && oPayment) {
       totalExtraPayment += oPayment
-      payments += oPayment
+      payments = payments + oPayment
     }
 
     if (diffMonthsForBiWeekly <= n && bPayment) {
       totalExtraPayment += bPayment
-      payments += bPayment
+      payments = payments + bPayment
     }
 
     if (diffMonthsForQuarterly <= n && n % 3 === 0 && qPayment) {
       totalExtraPayment += qPayment
-      payments += qPayment
+      payments = payments + qPayment
     }
 
     if (diffMonthsForYearly <= n && n % 12 === 0 && yPayment) {
       totalExtraPayment += yPayment
-      payments += yPayment
+      payments = payments + yPayment
     }
 
-    if (payments) {
-      balance = balance - (principal + payments)
-      totalInterest += newInterest
-    } else {
-      totalInterest += newInterest
-      balance = balance - principal
-    }
-
-    if (balance < 0) {
-      totalExtraPayment += balance
-    }
+    balance = balance - (principal + payments)
+    totalInterest += newInterest
 
     payments = 0
-    n++
+    n += 1
   }
 
-  return {totalInterest: totalInterest, totalExtraPayment, months: n} // minor difference due to decimals places
+  return {totalInterest: totalInterest, totalExtraPayment, months: n}
 }
-
-const getNewInterestPerMonth = (balance, interest, days = 30) => ((balance * interest) / 36000) * days // 100 - interest, 12 - months, 30 - days
 
 export default getExtraPaymentsAndInterest

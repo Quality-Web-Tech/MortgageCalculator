@@ -1,4 +1,5 @@
 import React, {createContext, useReducer, useContext} from 'react'
+import {unformat} from '../utils/formatter'
 
 const AdvanceMortgageCalculator = createContext()
 
@@ -55,9 +56,28 @@ function AdvanceMortgageCalculatorProvider(props) {
     (state, action) => {
       switch (action.type) {
         case 'UPDATE_ADVANCE_FORM': {
-          let {mortgageAmount, loanTerm, interest, pmi} = action.form
+          let {
+            mortgageAmount: mg,
+            loanTerm,
+            interest,
+            pmi,
+            monthlyOrBiWeekly: mob,
+            oneTime: ot,
+            quarterly: qt,
+            yearly: yl,
+            hoaFees,
+          } = action.form
 
           const interestForRaw = interest / 100 / 12 // 12 months per year, monthly interest
+
+          const {formatted: mortgageAmount} = unformat(mg)
+          const {formatted: mobPayment} = unformat(mob.payment)
+          const {formatted: otPayment} = unformat(ot.payment)
+          const {formatted: qtPayment} = unformat(qt.payment)
+          const {formatted: ylPayment} = unformat(yl.payment)
+          const {formatted: hFees} = unformat(hoaFees)
+
+          // console.log(action.form.monthlyOrBiWeekly, typeof action.form.monthlyOrBiWeekly.payment)
           const monthlyPaymentRaw = preCalculateMonthlyPaymentRaw({
             mortgageAmount,
             loanTerm: loanTerm.months,
@@ -68,6 +88,23 @@ function AdvanceMortgageCalculatorProvider(props) {
             ...state,
             advance: {
               ...action.form,
+              hoaFees: hFees,
+              oneTime: {
+                ...ot,
+                payment: otPayment,
+              },
+              monthlyOrBiWeekly: {
+                ...mob,
+                payment: mobPayment,
+              },
+              quarterly: {
+                ...qt,
+                payment: qtPayment,
+              },
+              yearly: {
+                ...yl,
+                payment: ylPayment,
+              },
               monthlyPaymentRaw,
               pmi: pmi.true,
             },
