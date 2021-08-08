@@ -7,10 +7,9 @@ import {Container, TextInput} from 'components'
 import LoanTerm from './LoanTerm'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
 import {useAdvanceMortgageCalculator, updateAdvanceForm} from '../../../context/advanceMortgageCalculator'
-import {formatDate, formatNumber} from '../../../utils/formatter'
+import {formatDate, formatNumber, unformat} from '../../../utils/formatter'
 import {NEW_FORM_INITIAL_STATE} from '../../../context/advanceMortgageCalculator'
 import {debounce} from 'lodash/fp'
-import numbro from 'numbro'
 import Switch from './Switch'
 import fontFamily from '../../../styles/fontFamily'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
@@ -44,12 +43,12 @@ const HDMInputSwitch = ({state, handleOnChangeText, children}) => {
           reverse: on,
           onToggle: toggle,
           icon: handleInputIncon(on),
-          value: on ? formatNumber(value[on]) : numbro(value[on] || 0).format({thousandSeparated: true}),
+          value: formatNumber(value[on]),
           onChangeText: val => {
-            val = numbro.unformat(val)
+            const {orig} = unformat(val)
 
-            setValue({...value, [on]: val})
-            return child.props.onChangeText(val, on, value, setValue)
+            setValue({...value, [on]: orig})
+            return child.props.onChangeText(orig, on, val, setValue)
           },
           optionSwitch: <Switch value={on} onToggle={toggle} />,
         })
@@ -151,15 +150,16 @@ export default function Home() {
               <TextInput
                 label="Home Value"
                 keyboardType="decimal-pad"
-                value={numbro(form.homeValue || 0).format({thousandSeparated: true})}
+                value={formatNumber(form.homeValue)}
                 icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
                 onChangeText={(homeValue, on, value) => {
-                  homeValue = numbro.unformat(homeValue)
-                  const diff = on ? (value[on] / 100) * homeValue : homeValue - value[!on]
-                  const mortgageAmount = homeValue - diff
+                  const {orig, formatted} = unformat(homeValue)
+
+                  const diff = on ? (value[on] / 100) * formatted : formatted - value[!on]
+                  const mortgageAmount = formatted - diff
 
                   handleOnChangeText({
-                    homeValue,
+                    homeValue: orig,
                     mortgageAmount,
                   })
                 }}
@@ -170,7 +170,9 @@ export default function Home() {
                 keyboardType="decimal-pad"
                 onChangeText={(percent, on, value) => {
                   const {homeValue} = form
-                  const diff = on ? (percent / 100) * homeValue : homeValue - value
+                  const {formatted} = unformat(value)
+                  const diff = on ? (percent / 100) * homeValue : formatted
+
                   const mortgageAmount = homeValue - diff
                   handleOnChangeText({
                     mortgageAmount,
@@ -181,15 +183,15 @@ export default function Home() {
               <TextInput
                 label="Mortgage Amount"
                 keyboardType="decimal-pad"
-                value={numbro(form.mortgageAmount || 0).format({thousandSeparated: true})}
+                value={formatNumber(form.mortgageAmount)}
                 icon={handleInputIncon(0)}
                 onChangeText={(mortgageAmount, on, value, setValue) => {
-                  mortgageAmount = numbro.unformat(mortgageAmount)
-                  const percent = (100 - (mortgageAmount / form.homeValue) * 100).toFixed(2)
+                  const {orig, formatted} = unformat(mortgageAmount)
+                  const percent = (100 - (formatted / form.homeValue) * 100).toFixed(2)
 
                   setValue({...value, [on]: percent})
                   handleOnChangeText({
-                    mortgageAmount,
+                    mortgageAmount: orig,
                     downPayment: form.homeValue * percent - form.homeValue,
                   })
                 }}
@@ -301,7 +303,7 @@ export default function Home() {
             </InputSwitch>
 
             <TextInput
-              value={formatNumber(form.hoaFees) || ''}
+              value={formatNumber(form.hoaFees)}
               label="HOA Fees (Monthly)"
               keyboardType="decimal-pad"
               icon={handleInputIncon(null)}

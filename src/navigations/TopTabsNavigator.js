@@ -12,7 +12,6 @@ const Tab = createMaterialTopTabNavigator()
 const TopTabNavigator = ({route}) => {
   return (
     <Tab.Navigator
-      initialRouteName="CHART"
       lazy
       tabBarOptions={{
         inactiveTintColor: colors.gray400,

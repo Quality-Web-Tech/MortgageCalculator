@@ -1,19 +1,24 @@
 import moment from 'moment'
 
 const formatDate = date => moment(date).format('MMMM DD, YYYY')
+
 const formatNumber = num => {
   if (num === undefined) return ''
   if (num === '') return ''
 
-  // prevent from adding comma after a perio
-  // const numArr = num.split('.')
-  // if (numArr.length > 2) return // too much period
-
-  // const leftNum = numArr[0]
   num = num.toString()
-  // if (num.length === 1) return num + '.00'
+  const arrStringNum = num.split('.')
 
-  return num.replaceAll(',', '').replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  if (arrStringNum.length > 2) return arrStringNum[0] + '.' + arrStringNum[1]
+  if (arrStringNum.length === 1) return num.replaceAll(',', '').replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  return arrStringNum[0] + '.' + arrStringNum[1]
 }
 
-export {formatDate, formatNumber}
+const unformat = num => {
+  return {
+    orig: num,
+    formatted: Number(formatNumber(num).replaceAll(',', '')),
+  }
+}
+
+export {formatDate, formatNumber, unformat}
