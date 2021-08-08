@@ -29,10 +29,10 @@ export default data => {
   pmi = typeof pmi === 'object' ? pmi.true : pmi
 
   const monthlyOrBiWeeklyPayment = monthlyOrBiWeekly.payment
-  propertyTax = paymentFrequency.type === 'Monthly' ? propertyTax / 12 : propertyTax / 12 / 2
-  homeInsurance = paymentFrequency.type === 'Monthly' ? homeInsurance / 12 : homeInsurance / 12 / 2
-  pmi = paymentFrequency.type === 'Monthly' ? (mortgageAmount * pmi) / 100 / 12 : (homeValue * pmi) / 100 / 12 / 2
-  hoaFees = paymentFrequency.type === 'Monthly' ? hoaFees : hoaFees / 2
+  propertyTax = paymentFrequency.type === 'Monthly' ? propertyTax / 12 : propertyTax / 26
+  homeInsurance = paymentFrequency.type === 'Monthly' ? homeInsurance / 12 : homeInsurance / 26
+  pmi = paymentFrequency.type === 'Monthly' ? (mortgageAmount * pmi) / 100 / 12 : (mortgageAmount * pmi) / 100 / 26
+  hoaFees = paymentFrequency.type === 'Monthly' ? hoaFees : (hoaFees * 12) / 26
 
   const totalPaymentMonthly =
     paymentFrequency.amount + monthlyOrBiWeeklyPayment + propertyTax + homeInsurance + pmi + hoaFees
@@ -42,22 +42,22 @@ export default data => {
     paymentFrequency,
     mortgageAmount,
     interest,
-    loanTerm.months,
+    loanTerm,
     oneTime,
     monthlyOrBiWeekly,
     quarterly,
     yearly,
-    monthlyPaymentRaw * loanTerm.months - mortgageAmount,
     monthlyPaymentRaw,
   )
 
   const principal = mortgageAmount - totalExtraPaymentAndInterest.totalExtraPayment
   const endDate = moment(startDate).add(totalExtraPaymentAndInterest.months - 1, 'months')
 
-  const totalTax = propertyTax * totalExtraPaymentAndInterest.months
-  const totalInsurance = homeInsurance * totalExtraPaymentAndInterest.months
-  const totalPMI = pmi * 45 // Default value is 44 months. In the actual app the default is 44 months
-  const totalHoaFees = hoaFees * totalExtraPaymentAndInterest.months
+  const totalFessMonths = paymentFrequency.type === 'Monthly' ? 0 : 2
+  const totalTax = propertyTax * (totalExtraPaymentAndInterest.months - totalFessMonths) // - 2 is an extra month being added to the calculateExtraPaymentsAndInterest
+  const totalInsurance = homeInsurance * (totalExtraPaymentAndInterest.months - totalFessMonths)
+  const totalPMI = pmi * (paymentFrequency.type === 'Monthly' ? 45 : 73) // Default value is 45 months, Biweel is 73
+  const totalHoaFees = hoaFees * (totalExtraPaymentAndInterest.months - totalFessMonths)
   const totalFees = totalTax + totalInsurance + totalPMI + totalHoaFees
 
   const totalAllPayments = totalFees + totalExtraPaymentAndInterest.totalInterest + mortgageAmount + downPayment

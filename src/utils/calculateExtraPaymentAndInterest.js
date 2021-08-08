@@ -1,25 +1,14 @@
 import moment from 'moment'
 
-const getExtraPaymentsAndInterest = (
-  paymenFrequency,
-  p,
-  r,
-  months,
-  oneTime,
-  biWeekly,
-  quarterly,
-  yearly,
-  defaultTotalInterest,
-  monthlyPaymentRaw,
-) => {
+const getExtraPaymentsAndInterest = (paymenFrequency, p, r, loanTerm, oneTime, biWeekly, quarterly, yearly) => {
   let {amount, type} = paymenFrequency
   let {payment: oPayment, startDate: oDate} = oneTime
   let {payment: bPayment, startDate: bDate} = biWeekly
   let {payment: qPayment, startDate: qDate} = quarterly
   let {payment: yPayment, startDate: yDate} = yearly
 
-  if (!oPayment && !bPayment && !qPayment && !yPayment)
-    return {totalInterest: defaultTotalInterest, totalExtraPayment: 0, months}
+  // if (!oPayment && !bPayment && !qPayment && !yPayment)
+  //   return {totalInterest: defaultTotalInterest, totalExtraPayment: 0, months}
 
   oPayment = Number(oPayment)
   bPayment = Number(bPayment)
@@ -37,18 +26,20 @@ const getExtraPaymentsAndInterest = (
   const diffMonthsForQuarterly = qDate.diff(today, 'months')
   const diffMonthsForYearly = yDate.diff(today, 'months')
 
-  amount = Number(amount)
-
   let n = 0
   let totalInterest = 0
   let balance = p // 255000
   let totalExtraPayment = 0
   let payments = 0
-  let interest = r / 1200
+  let interestPerType = r / 1200
+
+  let months = type === 'Monthly' ? loanTerm.months : loanTerm.years * 26
+
+  const interest = type === 'Monthly' ? interestPerType : (interestPerType * 12) / 26
 
   while (n < months && balance >= 0) {
     let newInterest = balance * interest // interest based on balance
-    let principal = monthlyPaymentRaw - newInterest // principal that goes to balance
+    let principal = amount - newInterest // principal that goes to balance
 
     // break if we can pay balance
     if (principal >= balance) {

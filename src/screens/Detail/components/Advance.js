@@ -31,7 +31,7 @@ function Detail() {
     totalFees,
     totalAllPayments,
     totalInterest,
-  } = calculateDetailAdvance({...advance})
+  } = calculateDetailAdvance(advance)
 
   return (
     <Container>
