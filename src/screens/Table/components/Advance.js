@@ -28,7 +28,14 @@ function AdvanceTable() {
 
   return (
     <Container>
-      <Picker value={term} onChange={setTerm} />
+      <Picker
+        value={term}
+        onChange={setTerm}
+        items={[
+          {label: 'Year', value: 'year'},
+          {label: 'All', value: 'all'},
+        ]}
+      />
 
       <ScrollView horizontal={true}>
         <View>

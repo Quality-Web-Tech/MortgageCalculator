@@ -215,20 +215,3 @@ const calcMonthlyAndYearly = data => {
 }
 
 export default calcMonthlyAndYearly
-
-// Save data before exiting
-// if (term === 0) {
-//   tableData.year.push(
-//     dataForYear(currentYear, yearInterest, yearPrincipal, totalExtraYearPayments, others, yearTotal, balance),
-//   )
-// }
-
-// n > 350 &&
-//   n < 355 &&
-//   console.log(currentYear, startMonth, ip, mmip, balance, currentYear, totalExtraYearPayments, yearPrincipal)
-
-// if (mmip + totalExtraYearPayments >= balance) {
-//   console.log(currentYear, startMonth, ip, mmip, balance, currentYear, totalExtraYearPayments, yearPrincipal)
-//   // tableData.year.push(dataForYear(currentYear, ip, balance, totalExtraYearPayments, others, yearTotal, 0))
-//   break
-// }

@@ -6,7 +6,14 @@ import themes from '../../styles/themes'
 import fontFamily from '../../styles/fontFamily'
 import RNPickerSelect from 'react-native-picker-select'
 
-export default function Picker({value, onChange}) {
+export default function Picker({
+  value,
+  onChange,
+  items = [
+    {label: 'Year', value: 'year'},
+    {label: 'Month', value: 'month'},
+  ],
+}) {
   return (
     <RNPickerSelect
       onValueChange={value => onChange(value)}
@@ -33,10 +40,7 @@ export default function Picker({value, onChange}) {
         },
       }}
       value={value}
-      items={[
-        {label: 'Year', value: 'year'},
-        {label: 'Month', value: 'month'},
-      ]}
+      items={items}
       Icon={() => {
         return <MaterialCommunityIcons name="chevron-down" size={26} color="gray" />
       }}
