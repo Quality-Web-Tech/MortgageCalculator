@@ -11,7 +11,7 @@ const InputSwitch = ({initialState = true, term = false, setter = () => null, st
   return React.Children.map(children, child => {
     return React.cloneElement(child, {
       reverse: on,
-      icon: term ? null : handleInputIncon(on),
+      icon: term ? null : handleInputIncon(Number(!on)),
       value: child.props.valueSetter(data[on]),
       optionSwitch: (
         <Switch

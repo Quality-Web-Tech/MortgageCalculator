@@ -90,7 +90,7 @@ export default function Home() {
               value={formatNumber(form.homeValue)}
               label="Home Value"
               keyboardType="decimal-pad"
-              icon={handleInputIncon(0)}
+              icon={handleInputIncon(1)}
               onChangeText={value => {
                 const numValue = unformat(value)
                 const {
@@ -150,7 +150,7 @@ export default function Home() {
               label="Mortgage Amount"
               keyboardType="decimal-pad"
               value={formatNumber(form.mortgageAmount)}
-              icon={handleInputIncon(0)}
+              icon={handleInputIncon(1)}
               onChangeText={value => {
                 const {homeValue} = form
                 const numValue = unformat(value)
@@ -201,7 +201,7 @@ export default function Home() {
               value={formatNumber(form.interest)}
               label="Interest Rate"
               keyboardType="decimal-pad"
-              icon={handleInputIncon(1)}
+              icon={handleInputIncon(0)}
               onChangeText={value => handleOnChangeText('interest', value, updateInterest)}
             />
 
@@ -294,7 +294,7 @@ export default function Home() {
               value={formatNumber(form.hoaFees)}
               label="HOA Fees (Monthly)"
               keyboardType="decimal-pad"
-              icon={handleInputIncon(null)}
+              icon={handleInputIncon(1)}
               onChangeText={value => handleOnChangeText('hoaFees', value, updateHoaFees)}
             />
 
@@ -324,7 +324,7 @@ export default function Home() {
                 value={formatNumber(form.oneTime.payment)}
                 label="One Time"
                 keyboardType="decimal-pad"
-                icon={handleInputIncon(0)}
+                icon={handleInputIncon(1)}
                 onChangeText={payment =>
                   handleOnChangeText('oneTime', {oneTime: {...form.oneTime, payment}}, updateOneTimePayment)
                 }
@@ -348,7 +348,7 @@ export default function Home() {
                 value={formatNumber(form.monthlyOrBiWeekly.payment)}
                 label="Monthly or Bi-Weekly"
                 keyboardType="decimal-pad"
-                icon={handleInputIncon(0)}
+                icon={handleInputIncon(1)}
                 onChangeText={payment =>
                   handleOnChangeText(
                     'monthlyOrBiWeekly',
@@ -376,7 +376,7 @@ export default function Home() {
                 value={formatNumber(form.quarterly.payment)}
                 label="Quarterly"
                 keyboardType="decimal-pad"
-                icon={handleInputIncon(0)}
+                icon={handleInputIncon(1)}
                 onChangeText={payment =>
                   handleOnChangeText('quarterly', {quarterly: {...form.quarterly, payment}}, updateQuarterlyPayment)
                 }
@@ -399,7 +399,7 @@ export default function Home() {
                 value={formatNumber(form.yearly.payment) || ''}
                 label="Yearly"
                 keyboardType="decimal-pad"
-                icon={handleInputIncon(0)}
+                icon={handleInputIncon(1)}
                 onChangeText={payment =>
                   handleOnChangeText(
                     'yearly',
@@ -416,7 +416,7 @@ export default function Home() {
                 reverse
                 clickable={true}
                 value={formatDate(form.yearly.startDate)}
-                label="On"
+                label="Starting"
                 icon={handleInputIncon(2)}
                 onPress={() => showDatePicker('yearly', updateYearlyPayment)}
               />

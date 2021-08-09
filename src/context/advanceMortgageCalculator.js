@@ -1,12 +1,12 @@
 import React, {createContext, useReducer, useContext} from 'react'
 import advanceReducer from './advanceReducer'
-import NEW_FORM_INITIAL_STATE from './advanceInitialState'
+import {INITIAL_STATE} from './advanceInitialState'
 
 const AdvanceStateMortgageCalculator = createContext()
 const AdvanceDispatchMortgageCalcualator = createContext()
 
 function AdvanceMortgageCalculatorProvider({children}) {
-  const [state, dispatch] = useReducer(advanceReducer, NEW_FORM_INITIAL_STATE)
+  const [state, dispatch] = useReducer(advanceReducer, INITIAL_STATE)
 
   return (
     <AdvanceStateMortgageCalculator.Provider value={state}>
