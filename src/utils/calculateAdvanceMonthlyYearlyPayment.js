@@ -81,7 +81,7 @@ const calcMonthlyAndYearly = data => {
   let previousYearPrincipal = 0
 
   const tableData = {
-    month: [],
+    all: [],
     year: [],
   }
   // yPayment = 100
@@ -144,7 +144,7 @@ const calcMonthlyAndYearly = data => {
     }
 
     // Save monthly data
-    tableData.month.push(
+    tableData.all.push(
       dataForMonth(
         startMonth,
         currentYear,
