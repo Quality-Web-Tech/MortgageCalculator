@@ -1,99 +1,48 @@
 import React, {useState} from 'react'
 import {Keyboard, TouchableWithoutFeedback, View, Text, ScrollView} from 'react-native'
 import colors from 'styles/colors'
-import {MaterialIcons, FontAwesome5} from '@expo/vector-icons'
+import {FontAwesome5} from '@expo/vector-icons'
 import variables from 'styles/variables'
 import {Container, TextInput} from 'components'
 import LoanTerm from './LoanTerm'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
-import {useAdvanceDispatchMortgageCalculator, updateAdvanceForm} from '../../../context/advanceMortgageCalculator'
+import {
+  useAdvanceDispatchMortgageCalculator,
+  useAdvanceStateMortgageCalculator,
+  updateHomeValue,
+  updateDownPayment,
+  updateMortgageAmount,
+  updateLoanTerm,
+  updateInterest,
+  updatePMI,
+  updatePropertyTax,
+  updateHomeInsurance,
+  updateHoaFees,
+  updatePaymentFrequency,
+  updateStartDate,
+  updateOneTimePayment,
+  updateBiWeeklyOrMonthlyPayment,
+  updateQuarterlyPayment,
+  updateYearlyPayment,
+} from '../../../context/advanceMortgageCalculator'
 import {formatDate, formatNumber, unformat} from '../../../utils/formatter'
-import NEW_FORM_INITIAL_STATE from '../../../context/advanceInitialState'
+import {INITIAL_STATE} from '../../../context/advanceInitialState'
 import {debounce} from 'lodash/fp'
-import Switch from './Switch'
 import fontFamily from '../../../styles/fontFamily'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
-
-const handleInputIncon = state => {
-  if (state === null) return null
-
-  return state ? (
-    <FontAwesome5 name="percent" size={variables.iconSizeExtraSmall} color={colors.gray400} />
-  ) : (
-    <MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />
-  )
-}
-
-const HDMInputSwitch = ({state, handleOnChangeText, children}) => {
-  const [on, setOn] = useState(true)
-  const [value, setValue] = useState(state)
-  const toggle = () => {
-    handleOnChangeText(!on, value)
-    setOn(!on)
-  }
-
-  return React.Children.map(children, (child, index) => {
-    return index !== 1
-      ? React.cloneElement(child, {
-          onChangeText: val => {
-            return child.props.onChangeText(val, on, value, setValue)
-          },
-        })
-      : React.cloneElement(child, {
-          reverse: on,
-          onToggle: toggle,
-          icon: handleInputIncon(on),
-          value: formatNumber(value[on]),
-          onChangeText: val => {
-            const {orig} = unformat(val)
-
-            setValue({...value, [on]: orig})
-            return child.props.onChangeText(orig, on, val, setValue)
-          },
-          optionSwitch: <Switch value={on} onToggle={toggle} />,
-        })
-  })
-}
-
-const InputSwitch = ({initialState = true, term = false, setter = () => null, state, children}) => {
-  const [on, setOn] = useState(initialState)
-  const [data, setData] = useState(state)
-  const toggle = () => setOn(!on)
-
-  return React.Children.map(children, child => {
-    return React.cloneElement(child, {
-      reverse: on,
-      icon: term ? null : handleInputIncon(on),
-      value: formatNumber(data[on]),
-      optionSwitch: (
-        <Switch
-          term={term}
-          value={on}
-          onToggle={() => {
-            setter()
-            toggle()
-            setData(state)
-          }}
-        />
-      ),
-      onChangeText: val => {
-        const newState = {...data, [on]: val}
-        setData(newState)
-        return child.props.onChangeText(newState, on)
-      },
-    })
-  })
-}
+import InputSwitch from './InputSwitch'
+import {handleInputIncon} from './helper'
 
 export default function Home() {
   const dispatch = useAdvanceDispatchMortgageCalculator()
+  const state = useAdvanceStateMortgageCalculator()
 
-  const [form, setForm] = useState(NEW_FORM_INITIAL_STATE)
+  const [form, setForm] = useState(INITIAL_STATE)
   const [inputWithDate, setInputWithDate] = useState()
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
 
-  const showDatePicker = key => {
-    setInputWithDate(key)
+  const showDatePicker = (key, cb) => {
+    setInputWithDate({key, cb})
     setDatePickerVisibility(true)
   }
 
@@ -103,32 +52,33 @@ export default function Home() {
 
   const handleConfirm = date => {
     Keyboard.dismiss()
-
-    if (inputWithDate !== 'startDate') {
-      let newInputState = {
-        [inputWithDate]: {
-          ...form[inputWithDate],
-          startDate: date,
-        },
-      }
-
-      handleOnChangeText(newInputState)
-    } else {
-      handleOnChangeText({startDate: date})
-    }
+    const {key, cb} = inputWithDate
+    key === 'startDate'
+      ? handleOnChangeText(key, date, cb)
+      : handleOnChangeText(
+          key,
+          {
+            [key]: {
+              ...form[key],
+              startDate: date,
+            },
+          },
+          cb,
+        )
     hideDatePicker()
   }
 
   const onChangeHandler = React.useCallback(
-    debounce(400, (...args) => updateAdvanceForm(...args)),
+    debounce(400, (value, dispatcher) => dispatcher(value, dispatch)),
     [],
   )
 
-  const handleOnChangeText = newdata => {
-    const newState = {...form, ...newdata}
-
-    setForm(newState)
-    onChangeHandler(newState, dispatch)
+  const handleOnChangeText = (key, value, cb) => {
+    typeof value === 'object' && !(value instanceof Date)
+      ? setForm({...form, ...value})
+      : setForm({...form, [key]: value})
+    if (!cb) return
+    onChangeHandler(value, cb)
   }
 
   return (
@@ -136,75 +86,96 @@ export default function Home() {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <KeyboardAwareScrollView>
           <Container>
-            <HDMInputSwitch
-              state={{true: '15.00', false: 45000}}
-              handleOnChangeText={(on, value) => {
-                const {homeValue} = form
-                const diff = on ? (value[on] / 100) * homeValue : value[on]
-                const mortgageAmount = homeValue - diff
+            <TextInput
+              value={formatNumber(form.homeValue)}
+              label="Home Value"
+              keyboardType="decimal-pad"
+              icon={handleInputIncon(0)}
+              onChangeText={value => {
+                const numValue = unformat(value)
+                const {
+                  downPayment: {percent},
+                } = form
+                const mortgageAmount = numValue - numValue * (percent / 100)
+                handleOnChangeText(
+                  'homeValue',
+                  {
+                    homeValue: value,
+                    mortgageAmount,
+                    downPayment: {
+                      percent,
+                      amount: numValue - mortgageAmount,
+                    },
+                  },
+                  updateHomeValue,
+                )
+              }}
+            />
 
-                handleOnChangeText({
-                  mortgageAmount,
-                })
+            <InputSwitch
+              state={{
+                true: 'percent',
+                false: 'amount',
               }}
             >
               <TextInput
-                label="Home Value"
-                keyboardType="decimal-pad"
-                value={formatNumber(form.homeValue)}
-                icon={<MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />}
-                onChangeText={(homeValue, on, value) => {
-                  const {orig, formatted} = unformat(homeValue)
-
-                  const diff = on ? (value[on] / 100) * formatted : formatted - value[!on]
-                  const mortgageAmount = formatted - diff
-
-                  handleOnChangeText({
-                    homeValue: orig,
-                    mortgageAmount,
-                  })
-                }}
-              />
-
-              <TextInput
                 label="Down Payment"
                 keyboardType="decimal-pad"
-                onChangeText={(percent, on, value) => {
+                valueSetter={type => formatNumber(form.downPayment[type])}
+                onChangeText={(value, type) => {
                   const {homeValue} = form
-                  const {formatted} = unformat(value)
-                  const diff = on ? (percent / 100) * homeValue : formatted
 
-                  const mortgageAmount = homeValue - diff
-                  handleOnChangeText({
-                    mortgageAmount,
-                  })
+                  const unformatValue = unformat(value)
+                  const numHomeValue = unformat(homeValue)
+                  const amount = type === 'percent' ? (unformatValue / 100) * numHomeValue : unformatValue
+                  const mortgageAmount = numHomeValue - amount
+                  const percent = ((unformatValue / numHomeValue) * 100).toFixed(2)
+
+                  handleOnChangeText(
+                    'downPayment',
+                    {
+                      downPayment: {
+                        amount: type !== 'amount' ? amount : value,
+                        percent: type === 'percent' ? value : percent,
+                      },
+                      mortgageAmount,
+                    },
+                    updateDownPayment,
+                  )
                 }}
               />
+            </InputSwitch>
 
-              <TextInput
-                label="Mortgage Amount"
-                keyboardType="decimal-pad"
-                value={formatNumber(form.mortgageAmount)}
-                icon={handleInputIncon(0)}
-                onChangeText={(mortgageAmount, on, value, setValue) => {
-                  const {orig, formatted} = unformat(mortgageAmount)
-                  const percent = (100 - (formatted / form.homeValue) * 100).toFixed(2)
+            <TextInput
+              label="Mortgage Amount"
+              keyboardType="decimal-pad"
+              value={formatNumber(form.mortgageAmount)}
+              icon={handleInputIncon(0)}
+              onChangeText={value => {
+                const {homeValue} = form
+                const numValue = unformat(value)
+                const percent = (100 - (numValue / homeValue) * 100).toFixed(2)
 
-                  setValue({...value, [on]: percent})
-                  handleOnChangeText({
-                    mortgageAmount: orig,
-                    downPayment: form.homeValue * percent - form.homeValue,
-                  })
-                }}
-              />
-            </HDMInputSwitch>
+                handleOnChangeText(
+                  'mortgageAmount',
+                  {
+                    mortgageAmount: numValue,
+                    downPayment: {
+                      amount: homeValue - homeValue * (percent - 100),
+                      percent,
+                    },
+                  },
+                  updateMortgageAmount,
+                )
+              }}
+            />
 
             <InputSwitch
               initialState={false}
               term
               state={{
-                true: form.loanTerm.months,
-                false: form.loanTerm.years,
+                true: 'months',
+                false: 'years',
               }}
             >
               <TextInput
@@ -212,15 +183,15 @@ export default function Home() {
                 keyboardType="decimal-pad"
                 showIcon={false}
                 icon={handleInputIncon(0)}
-                onChangeText={(value, on) => {
-                  const {false: years, true: months} = value
-
+                valueSetter={type => formatNumber(form.loanTerm[type])}
+                onChangeText={(value, type) => {
+                  const numValue = unformat(value)
                   const terms = {
-                    years: Number(!on ? years : Math.floor(months / 12)),
-                    months: Number(on ? months : years * 12),
+                    years: type === 'years' ? value : Math.floor(numValue / 12),
+                    months: type == 'months' ? value : numValue * 12,
                   }
 
-                  handleOnChangeText({loanTerm: terms})
+                  handleOnChangeText('loanTerm', {loanTerm: terms}, updateLoanTerm)
                 }}
               />
             </InputSwitch>
@@ -231,56 +202,61 @@ export default function Home() {
               label="Interest Rate"
               keyboardType="decimal-pad"
               icon={handleInputIncon(1)}
-              onChangeText={interest => handleOnChangeText({interest: interest})}
-            />
-
-            <TextInput
-              label="PMI (Yearly)"
-              keyboardType="decimal-pad"
-              reverse={form.pmi.isPercent}
-              optionSwitch={
-                <Switch
-                  value={form.pmi.isPercent}
-                  onToggle={() => {
-                    const {isPercent} = form.pmi
-                    handleOnChangeText({
-                      pmi: {
-                        ...form.pmi,
-                        isPercent: !isPercent,
-                        value: isPercent ? (form.pmi.true / 100) * form.mortgageAmount : form.pmi.true,
-                      },
-                    })
-                  }}
-                />
-              }
-              value={formatNumber(form.pmi.value)}
-              icon={handleInputIncon(form.pmi.isPercent)}
-              onChangeText={value =>
-                handleOnChangeText({
-                  pmi: {
-                    ...form.pmi,
-                    [form.pmi.isPercent]: value,
-                    value,
-                  },
-                })
-              }
+              onChangeText={value => handleOnChangeText('interest', value, updateInterest)}
             />
 
             <InputSwitch
-              initialState={false}
               state={{
-                false: 3000,
-                true: 1,
+                true: 'percent',
+                false: 'amount',
+              }}
+            >
+              <TextInput
+                label="PMI (Yearly)"
+                keyboardType="decimal-pad"
+                showIcon={false}
+                icon={handleInputIncon(0)}
+                valueSetter={type => formatNumber(form.pmi[type])}
+                onChangeText={(value, type) => {
+                  const numValue = unformat(value)
+                  handleOnChangeText(
+                    'pmi',
+                    {
+                      pmi: {
+                        percent: type === 'percent' ? value : ((numValue / form.mortgageAmount) * 100).toFixed(2),
+                        amount: type === 'amount' ? value : (numValue / 100) * form.mortgageAmount,
+                      },
+                    },
+                    updatePMI,
+                  )
+                }}
+              />
+            </InputSwitch>
+
+            <InputSwitch
+              state={{
+                true: 'percent',
+                false: 'amount',
               }}
             >
               <TextInput
                 label="Property Tax (Yearly)"
                 keyboardType="decimal-pad"
-                onChangeText={(value, selected) => {
-                  const {false: dollar, true: percent} = value
-                  handleOnChangeText({
-                    propertyTax: selected ? (percent / 100) * form.homeValue : dollar,
-                  })
+                showIcon={false}
+                icon={handleInputIncon(0)}
+                valueSetter={type => formatNumber(form.propertyTax[type])}
+                onChangeText={(value, type) => {
+                  const numValue = unformat(value)
+                  handleOnChangeText(
+                    'propertyTax',
+                    {
+                      propertyTax: {
+                        percent: type === 'percent' ? value : ((numValue / form.homeValue) * 100).toFixed(2),
+                        amount: type === 'amount' ? value : (numValue / 100) * form.homeValue,
+                      },
+                    },
+                    updatePropertyTax,
+                  )
                 }}
               />
             </InputSwitch>
@@ -288,18 +264,28 @@ export default function Home() {
             <InputSwitch
               initialState={false}
               state={{
-                false: 1500,
-                true: 0.5,
+                true: 'percent',
+                false: 'amount',
               }}
             >
               <TextInput
                 label="Home Insurance (Yearly)"
                 keyboardType="decimal-pad"
-                onChangeText={(value, selected) => {
-                  const {false: dollar, true: percent} = value
-                  handleOnChangeText({
-                    homeInsurance: selected ? (percent / 100) * form.homeValue : dollar,
-                  })
+                showIcon={false}
+                icon={handleInputIncon(0)}
+                valueSetter={type => formatNumber(form.homeInsurance[type])}
+                onChangeText={(value, type) => {
+                  const numValue = unformat(value)
+                  handleOnChangeText(
+                    'homeInsurance',
+                    {
+                      homeInsurance: {
+                        percent: type === 'percent' ? value : ((numValue / form.homeValue) * 100).toFixed(2),
+                        amount: type === 'amount' ? value : (numValue / 100) * form.homeValue,
+                      },
+                    },
+                    updateHomeInsurance,
+                  )
                 }}
               />
             </InputSwitch>
@@ -309,22 +295,14 @@ export default function Home() {
               label="HOA Fees (Monthly)"
               keyboardType="decimal-pad"
               icon={handleInputIncon(null)}
-              onChangeText={value => {
-                handleOnChangeText({
-                  hoaFees: value,
-                })
-              }}
+              onChangeText={value => handleOnChangeText('hoaFees', value, updateHoaFees)}
             />
 
             <LoanTerm
               value={form.paymentFrequency}
               leftLabel="Payment Frequency"
               data={['Monthly', 'Bi-Weekly']}
-              onChange={value =>
-                handleOnChangeText({
-                  paymentFrequency: value,
-                })
-              }
+              onChange={value => handleOnChangeText('paymentFrequency', value, updatePaymentFrequency)}
             />
 
             <TextInput
@@ -333,7 +311,7 @@ export default function Home() {
               value={formatDate(form.startDate)}
               label="Start Date"
               icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
-              onPress={() => showDatePicker('startDate')}
+              onPress={() => showDatePicker('startDate', updateStartDate)}
             />
 
             <Text style={{fontFamily: fontFamily.MONTSERRAT_BOLD, color: colors.gray600, marginVertical: 16}}>
@@ -347,7 +325,9 @@ export default function Home() {
                 label="One Time"
                 keyboardType="decimal-pad"
                 icon={handleInputIncon(0)}
-                onChangeText={value => handleOnChangeText({oneTime: {...form.oneTime, payment: value}})}
+                onChangeText={payment =>
+                  handleOnChangeText('oneTime', {oneTime: {...form.oneTime, payment}}, updateOneTimePayment)
+                }
               />
 
               <TextInput
@@ -357,8 +337,8 @@ export default function Home() {
                 clickable={true}
                 value={formatDate(form.oneTime.startDate)}
                 label="On"
-                icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
-                onPress={() => showDatePicker('oneTime')}
+                icon={handleInputIncon(2)}
+                onPress={() => showDatePicker('oneTime', updateOneTimePayment)}
               />
             </View>
 
@@ -369,8 +349,12 @@ export default function Home() {
                 label="Monthly or Bi-Weekly"
                 keyboardType="decimal-pad"
                 icon={handleInputIncon(0)}
-                onChangeText={value =>
-                  handleOnChangeText({monthlyOrBiWeekly: {...form.monthlyOrBiWeekly, payment: value}})
+                onChangeText={payment =>
+                  handleOnChangeText(
+                    'monthlyOrBiWeekly',
+                    {monthlyOrBiWeekly: {...form.monthlyOrBiWeekly, payment}},
+                    updateBiWeeklyOrMonthlyPayment,
+                  )
                 }
               />
 
@@ -381,8 +365,8 @@ export default function Home() {
                 clickable={true}
                 value={formatDate(form.monthlyOrBiWeekly.startDate)}
                 label="Starting"
-                icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
-                onPress={() => showDatePicker('monthlyOrBiWeekly')}
+                icon={handleInputIncon(2)}
+                onPress={() => showDatePicker('monthlyOrBiWeekly', updateBiWeeklyOrMonthlyPayment)}
               />
             </View>
 
@@ -393,7 +377,9 @@ export default function Home() {
                 label="Quarterly"
                 keyboardType="decimal-pad"
                 icon={handleInputIncon(0)}
-                onChangeText={value => handleOnChangeText({quarterly: {...form.quarterly, payment: value}})}
+                onChangeText={payment =>
+                  handleOnChangeText('quarterly', {quarterly: {...form.quarterly, payment}}, updateQuarterlyPayment)
+                }
               />
               <TextInput
                 containerStyle={{width: '45%'}}
@@ -402,8 +388,8 @@ export default function Home() {
                 clickable={true}
                 value={formatDate(form.quarterly.startDate) || ''}
                 label="Starting"
-                icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
-                onPress={() => showDatePicker('quarterly')}
+                icon={handleInputIncon(2)}
+                onPress={() => showDatePicker('quarterly', updateQuarterlyPayment)}
               />
             </View>
 
@@ -414,10 +400,14 @@ export default function Home() {
                 label="Yearly"
                 keyboardType="decimal-pad"
                 icon={handleInputIncon(0)}
-                onChangeText={value =>
-                  handleOnChangeText({
-                    yearly: {...form.yearly, payment: value},
-                  })
+                onChangeText={payment =>
+                  handleOnChangeText(
+                    'yearly',
+                    {
+                      yearly: {...form.yearly, payment},
+                    },
+                    updateYearlyPayment,
+                  )
                 }
               />
               <TextInput
@@ -425,10 +415,10 @@ export default function Home() {
                 inputPressableStyle={{fontSize: 12}}
                 reverse
                 clickable={true}
-                value={formatDate(form.yearly.startDate) || ''}
+                value={formatDate(form.yearly.startDate)}
                 label="On"
-                icon={<FontAwesome5 name="calendar-alt" size={variables.iconSizeSmall} color={colors.gray400} />}
-                onPress={() => showDatePicker('yearly')}
+                icon={handleInputIncon(2)}
+                onPress={() => showDatePicker('yearly', updateYearlyPayment)}
               />
             </View>
 

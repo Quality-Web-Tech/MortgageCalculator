@@ -33,11 +33,42 @@ function useAdvanceDispatchMortgageCalculator() {
   return context
 }
 
-const updateAdvanceForm = (form, dispatch) => dispatch({type: 'UPDATE_ADVANCE_FORM', form})
+// const updateStateForm = ()
+const updateHomeValue = (homeValue, dispatch) => dispatch({type: 'UPDATE_HOMEVALUE', homeValue})
+const updateDownPayment = (downPayment, dispatch) => dispatch({type: 'UPDATE_DOWNPAYMENT', downPayment})
+const updateMortgageAmount = (mortgageAmount, dispatch) => dispatch({type: 'UPDATE_MORTGAGEAMOUNT', mortgageAmount})
+const updateLoanTerm = (loanTerm, dispatch) => dispatch({type: 'UPDATE_LOANTERM', loanTerm})
+const updateInterest = (interest, dispatch) => dispatch({type: 'UPDATE_INTEREST', interest})
+const updatePMI = (pmi, dispatch) => dispatch({type: 'UPDATE_PMI', pmi})
+const updatePropertyTax = (propertyTax, dispatch) => dispatch({type: 'UPDATE_PROPERTYTAX', propertyTax})
+const updateHomeInsurance = (homeInsurance, dispatch) => dispatch({type: 'UPDATE_HOMEINSURANCE', homeInsurance})
+const updateHoaFees = (hoa, dispatch) => dispatch({type: 'UPDATE_HOA', hoa})
+const updatePaymentFrequency = (paymentFrequency, dispatch) =>
+  dispatch({type: 'UPDATE_PAYMENTFREQUENCY', paymentFrequency})
+const updateStartDate = (startDate, dispatch) => dispatch({type: 'UPDATE_STARTDATE', startDate})
+const updateOneTimePayment = (oneTime, dispatch) => dispatch({type: 'UPDATE_ONETIMEPAYMENT', oneTime})
+const updateBiWeeklyOrMonthlyPayment = (monthlyOrBiWeekly, dispatch) =>
+  dispatch({type: 'UPDATE_BIWEEKLYORMONTHLY', monthlyOrBiWeekly})
+const updateQuarterlyPayment = (quarterly, dispatch) => dispatch({type: 'UPDATE_QUARTERLYPAYMENT', quarterly})
+const updateYearlyPayment = (yearly, dispatch) => dispatch({type: 'UPDATE_YEARLYPAYMENT', yearly})
 
 export {
   AdvanceMortgageCalculatorProvider,
   useAdvanceStateMortgageCalculator,
   useAdvanceDispatchMortgageCalculator,
-  updateAdvanceForm,
+  updateHomeValue,
+  updateDownPayment,
+  updateMortgageAmount,
+  updateLoanTerm,
+  updateInterest,
+  updatePMI,
+  updatePropertyTax,
+  updateHomeInsurance,
+  updateHoaFees,
+  updatePaymentFrequency,
+  updateStartDate,
+  updateOneTimePayment,
+  updateBiWeeklyOrMonthlyPayment,
+  updateQuarterlyPayment,
+  updateYearlyPayment,
 }
