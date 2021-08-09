@@ -1,10 +1,10 @@
 import calculateExtraPaymentsAndInterest from './calculateExtraPaymentAndInterest'
-
+import {unformat} from '../utils/formatter'
 import moment from 'moment'
 
 export default data => {
   let {
-    homeValue,
+    homeValue: hv,
     monthlyPaymentRaw,
     paymentFrequency,
     mortgageAmount, // 12 months per year, monthly interest
@@ -29,6 +29,7 @@ export default data => {
   pmi = typeof pmi === 'object' ? pmi.true : pmi
 
   const isMonthly = paymentFrequency.type === 'Monthly' ? true : false
+  const {formatted: homeValue} = unformat(hv)
 
   const monthlyOrBiWeeklyPayment = monthlyOrBiWeekly.payment
   propertyTax = isMonthly ? propertyTax / 12 : propertyTax / 26
@@ -38,7 +39,7 @@ export default data => {
 
   const totalPaymentMonthly =
     paymentFrequency.amount + monthlyOrBiWeeklyPayment + propertyTax + homeInsurance + pmi + hoaFees
-  const downPayment = homeValue - mortgageAmount
+  const downPayment = homeValue - mortgageAmount // PMI not required if downpayment is 20%
   const pmiThreshhold = homeValue - homeValue * 0.2 // downpayment and loan princiapl paid reach 20% stop pmi
 
   const {totalExtraPayment, months, totalInterest, pmiDuration} = calculateExtraPaymentsAndInterest(

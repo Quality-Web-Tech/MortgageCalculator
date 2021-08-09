@@ -3,12 +3,13 @@ import calculateExtraPaymentsAndInterest from './calculateExtraPaymentAndInteres
 import {FontAwesome5, MaterialCommunityIcons, Fontisto} from '@expo/vector-icons'
 import colors from '../styles/colors'
 import moment from 'moment'
+import {unformat} from '../utils/formatter'
 
 const calcPercentage = (total, val) => Number(((val / total) * 100).toFixed(2))
 
 export default data => {
   let {
-    homeValue,
+    homeValue: hv,
     monthlyPaymentRaw,
     paymentFrequency,
     mortgageAmount, // 12 months per year, monthly interest
@@ -31,6 +32,8 @@ export default data => {
       : {type: paymentFrequency, amount: monthlyPaymentRaw / 2}
 
   pmi = typeof pmi === 'object' ? pmi.true : pmi
+
+  const {formatted: homeValue} = unformat(hv)
 
   const monthlyOrBiWeeklyPayment = monthlyOrBiWeekly.payment
   propertyTax = paymentFrequency.type === 'Monthly' ? propertyTax / 12 : propertyTax / 12 / 2
