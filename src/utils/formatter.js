@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-const formatDate = date => moment(date).format('MMMM DD, YYYY')
+const formatDate = (date, defaultFormat = 'MMMM DD, YYYY') => moment(date).format(defaultFormat)
 
 const formatNumber = num => {
   if (num === undefined) return ''

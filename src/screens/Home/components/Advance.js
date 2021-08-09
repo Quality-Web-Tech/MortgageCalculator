@@ -72,6 +72,7 @@ const InputSwitch = ({initialState = true, term = false, setter = () => null, st
           onToggle={() => {
             setter()
             toggle()
+            setData(state)
           }}
         />
       ),
@@ -202,8 +203,8 @@ export default function Home() {
               initialState={false}
               term
               state={{
-                false: 30,
-                true: 360,
+                true: form.loanTerm.months,
+                false: form.loanTerm.years,
               }}
             >
               <TextInput
@@ -211,14 +212,15 @@ export default function Home() {
                 keyboardType="decimal-pad"
                 showIcon={false}
                 icon={handleInputIncon(0)}
-                onChangeText={value => {
+                onChangeText={(value, on) => {
                   const {false: years, true: months} = value
-                  handleOnChangeText({
-                    loanTerm: {
-                      years: Number(years),
-                      months: Number(months),
-                    },
-                  })
+
+                  const terms = {
+                    years: Number(!on ? years : Math.floor(months / 12)),
+                    months: Number(on ? months : years * 12),
+                  }
+
+                  handleOnChangeText({loanTerm: terms})
                 }}
               />
             </InputSwitch>

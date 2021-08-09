@@ -77,7 +77,6 @@ function AdvanceMortgageCalculatorProvider(props) {
           const {formatted: ylPayment} = unformat(yl.payment)
           const {formatted: hFees} = unformat(hoaFees)
 
-          // console.log(action.form.monthlyOrBiWeekly, typeof action.form.monthlyOrBiWeekly.payment)
           const monthlyPaymentRaw = preCalculateMonthlyPaymentRaw({
             mortgageAmount,
             loanTerm: loanTerm.months,
