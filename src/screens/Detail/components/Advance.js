@@ -4,13 +4,13 @@ import colors from 'styles/colors'
 import {MaterialIcons} from '@expo/vector-icons'
 import variables from 'styles/variables'
 import {Container, TextInput} from 'components'
-import {useAdvanceMortgageCalculator} from 'context/advanceMortgageCalculator'
+import {useAdvanceStateMortgageCalculator} from '../../../context/advanceMortgageCalculator'
 import calculateDetailAdvance from '../../../utils/calculateDetailAdvance'
 import numbro from 'numbro'
 
 function Detail() {
-  const [{advance}] = useAdvanceMortgageCalculator()
-  const {data} = calculateDetailAdvance(advance)
+  const advance = useAdvanceStateMortgageCalculator()
+  const data = calculateDetailAdvance(advance)
 
   return (
     <Container>

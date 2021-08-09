@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import {Text, View} from 'react-native'
 import styles from 'styles/styles'
 import {Container, FlatList} from 'components'
-import {useAdvanceMortgageCalculator} from '../../../context/advanceMortgageCalculator'
+import {useAdvanceStateMortgageCalculator} from '../../../context/advanceMortgageCalculator'
 import {formatNumber} from 'utils/formatter'
 import {PieChart} from 'react-native-svg-charts'
 import calculateAdvanceChart from '../../../utils/calculateAdvanceChart'
@@ -24,7 +24,7 @@ function ListItem({data}) {
 ListItem = React.memo(ListItem)
 
 function Chart() {
-  const [{advance}] = useAdvanceMortgageCalculator()
+  const advance = useAdvanceStateMortgageCalculator()
   const {interestPrincipalPercentage: data, totalPayment} = calculateAdvanceChart(advance)
 
   const [pieLayout, setPieLayout] = useState()

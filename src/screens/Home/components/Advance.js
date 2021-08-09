@@ -6,9 +6,9 @@ import variables from 'styles/variables'
 import {Container, TextInput} from 'components'
 import LoanTerm from './LoanTerm'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
-import {useAdvanceMortgageCalculator, updateAdvanceForm} from '../../../context/advanceMortgageCalculator'
+import {useAdvanceDispatchMortgageCalculator, updateAdvanceForm} from '../../../context/advanceMortgageCalculator'
 import {formatDate, formatNumber, unformat} from '../../../utils/formatter'
-import {NEW_FORM_INITIAL_STATE} from '../../../context/advanceMortgageCalculator'
+import NEW_FORM_INITIAL_STATE from '../../../context/advanceInitialState'
 import {debounce} from 'lodash/fp'
 import Switch from './Switch'
 import fontFamily from '../../../styles/fontFamily'
@@ -86,7 +86,7 @@ const InputSwitch = ({initialState = true, term = false, setter = () => null, st
 }
 
 export default function Home() {
-  const [, dispatch] = useAdvanceMortgageCalculator()
+  const dispatch = useAdvanceDispatchMortgageCalculator()
 
   const [form, setForm] = useState(NEW_FORM_INITIAL_STATE)
   const [inputWithDate, setInputWithDate] = useState()
