@@ -47,12 +47,11 @@ export default data => {
     paymentFrequency,
     mortgageAmount,
     interest,
-    loanTerm.months,
+    loanTerm,
     oneTime,
     monthlyOrBiWeekly,
     quarterly,
     yearly,
-    monthlyPaymentRaw * loanTerm.months - mortgageAmount,
   )
 
   const principal = mortgageAmount - totalExtraPaymentAndInterest.totalExtraPayment
