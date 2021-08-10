@@ -3,26 +3,26 @@ import {calulateTotalMonthlyPayments} from './calculations'
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 const dataForMonth = (startMonth, currentYear, ip, mmip, totalExtraYearPayments, others, total, balance) => {
-  return [
-    `${months[startMonth || 0]}, ${currentYear}`,
-    ip.toFixed(2),
-    mmip.toFixed(2),
-    totalExtraYearPayments,
-    others,
-    total,
-    balance < 0 ? 0 : balance.toFixed(2),
-  ]
+  return {
+    label: `${months[startMonth || 0]}, ${currentYear}`,
+    interest: ip.toFixed(2),
+    principal: mmip.toFixed(2),
+    extraPayment: totalExtraYearPayments.toFixed(2),
+    others: others.toFixed(2),
+    total: total.toFixed(2),
+    balance: balance < 0 ? 0 : balance.toFixed(2),
+  }
 }
 const dataForYear = (currentYear, yearInterest, yearPrincipal, totalExtraYearPayments, others, yearTotal, balance) => {
-  return [
-    currentYear,
-    yearInterest.toFixed(2),
-    yearPrincipal.toFixed(2),
-    totalExtraYearPayments,
-    others,
-    yearTotal,
-    balance,
-  ]
+  return {
+    label: currentYear,
+    interest: yearInterest.toFixed(2),
+    principal: yearPrincipal.toFixed(2),
+    extraPayment: totalExtraYearPayments.toFixed(2),
+    others: others.toFixed(2),
+    total: yearTotal.toFixed(2),
+    balance: balance.toFixed(2),
+  }
 }
 
 const calcMonthlyAndYearly = data => {
@@ -204,9 +204,7 @@ const calcMonthlyAndYearly = data => {
     monthOthers = 0
   }
 
-  return {
-    data: tableData,
-  }
+  return tableData
 }
 
 export default calcMonthlyAndYearly

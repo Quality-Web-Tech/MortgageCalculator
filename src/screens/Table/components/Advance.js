@@ -1,30 +1,63 @@
 import React from 'react'
-import {View, ScrollView} from 'react-native'
+import {View, Text, useWindowDimensions, ScrollView} from 'react-native'
 import styles from '../../../styles/styles'
-import {Container, Picker} from 'components'
+import {Container, Picker, FlatList} from 'components'
+import {formatNumber} from 'utils/formatter'
 import {useAdvanceStateMortgageCalculator} from '../../../context/advanceMortgageCalculator'
 import calculateAdvanceMonthlyYearlyPayment from '../../../utils/calculateAdvanceMonthlyYearlyPayment'
-import {Table, Row} from 'react-native-table-component'
-import numbro from 'numbro'
 
-const tableHead = ['DATE', 'INTEREST', 'PRINCIPAL', 'EXTRA', 'OTHERS', 'TOTAL', 'BALANCE']
+const headerFontSize = (width, size) => {
+  if (width >= 380) return {}
+  return {fontSize: size}
+}
 
-function AdvanceTable() {
+function ListHeader({term}) {
+  const screenWidth = useWindowDimensions().width
+  const headerFontSizeStyle = headerFontSize(screenWidth, 11)
+
+  return (
+    <View style={[styles.listTableHeaderContainer]}>
+      <Text style={[styles.listTableHeader, term === 'year' ? {width: 50} : {width: 75}, headerFontSizeStyle]}>
+        {term === 'year' ? 'DATE' : 'ALL'}
+      </Text>
+      <Text style={[styles.listTableHeader, {flex: 1}, headerFontSizeStyle]}>INTEREST</Text>
+      <Text style={[styles.listTableHeader, {flex: 1}, headerFontSizeStyle]}>PRINCIPAL</Text>
+      <Text style={[styles.listTableHeader, {flex: 1, textAlign: 'center'}, headerFontSizeStyle]}>Extra</Text>
+      <Text style={[styles.listTableHeader, {flex: 1}, headerFontSizeStyle]}>OTHERS</Text>
+      <Text style={[styles.listTableHeader, {flex: 1}, headerFontSizeStyle]}>TOTAL</Text>
+      <Text style={[styles.listTableHeader, {flex: 1}, headerFontSizeStyle]}>BALANCE</Text>
+    </View>
+  )
+}
+ListHeader = React.memo(ListHeader)
+
+function ListItem({term, data}) {
+  const {label, interest, principal, total, balance, others, extraPayment} = data
+  const screenWidth = useWindowDimensions().width
+  const headerFontSizeStyle = headerFontSize(screenWidth, 12)
+  return (
+    <View style={styles.listItemTableContainer}>
+      <Text style={[styles.listItemTable, term === 'year' ? {width: 50} : {width: 75}, headerFontSizeStyle]}>
+        {label}
+      </Text>
+      <Text style={[styles.listItemTable, {flex: 1}, headerFontSizeStyle]}>${formatNumber(interest)}</Text>
+      <Text style={[styles.listItemTable, {flex: 1}, headerFontSizeStyle]}>${formatNumber(principal)}</Text>
+      <Text style={[styles.listItemTable, {flex: 1, textAlign: 'center'}, headerFontSizeStyle]}>
+        ${formatNumber(extraPayment)}
+      </Text>
+      <Text style={[styles.listItemTable, {flex: 1}, headerFontSizeStyle]}>${formatNumber(others)}</Text>
+      <Text style={[styles.listItemTable, {flex: 1}, headerFontSizeStyle]}>${formatNumber(total)}</Text>
+      <Text style={[styles.listItemTable, {flex: 1}, headerFontSizeStyle]}>${formatNumber(balance)}</Text>
+    </View>
+  )
+}
+
+ListItem = React.memo(ListItem)
+
+function Table() {
   const advance = useAdvanceStateMortgageCalculator()
+  const tableData = calculateAdvanceMonthlyYearlyPayment(advance)
   const [term, setTerm] = React.useState('year')
-  const {data} = calculateAdvanceMonthlyYearlyPayment(advance)
-
-  const widthArr = [term == 'year' ? 60 : 90, 85, 90, 80, 80, 80, 80]
-  const tableData = []
-  for (let i = 0; i < data[term].length; i += 1) {
-    const rowData = []
-    for (let j = 0; j < data[term][i].length; j += 1) {
-      j === 0
-        ? rowData.push(data[term][i][j])
-        : rowData.push(`$${numbro(data[term][i][j]).format({thousandSeparated: true, mantissa: 2})}`)
-    }
-    tableData.push(rowData)
-  }
 
   return (
     <Container>
@@ -36,34 +69,19 @@ function AdvanceTable() {
           {label: 'All', value: 'all'},
         ]}
       />
-
       <ScrollView horizontal={true}>
-        <View>
-          <Table>
-            <Row
-              data={tableHead}
-              widthArr={widthArr}
-              style={styles.listTableHeaderContainer}
-              textStyle={[styles.listTableHeader]}
-            />
-          </Table>
-          <ScrollView>
-            <Table>
-              {tableData.map((rowData, index) => (
-                <Row
-                  key={index}
-                  data={rowData}
-                  widthArr={widthArr}
-                  style={[styles.listItemTableContainer]}
-                  textStyle={styles.listItemTable}
-                />
-              ))}
-            </Table>
-          </ScrollView>
-        </View>
+        <FlatList
+          contentContainerStyle={{width: term === 'year' ? 520 : 560}}
+          listItem={item => <ListItem term={term} data={item} />}
+          data={tableData[term]}
+          numColumns={1}
+          keyExtractor={item => item.label.toString()}
+          ListHeaderComponent={() => <ListHeader term={term} />}
+          horizontal={false}
+        />
       </ScrollView>
     </Container>
   )
 }
 
-export default React.memo(AdvanceTable)
+export default React.memo(Table)
