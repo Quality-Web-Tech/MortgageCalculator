@@ -4,10 +4,10 @@ import moment from 'moment'
 
 export default data => {
   let {
-    homeValue: hv,
+    homeValue,
     monthlyPaymentRaw,
     paymentFrequency,
-    mortgageAmount, // 12 months per year, monthly interest
+    mortgageAmount,
     interest,
     loanTerm,
     monthlyOrBiWeekly,
@@ -19,6 +19,7 @@ export default data => {
     oneTime,
     quarterly,
     yearly,
+    downPayment,
   } = data
 
   paymentFrequency =
@@ -26,20 +27,16 @@ export default data => {
       ? {type: paymentFrequency, amount: monthlyPaymentRaw}
       : {type: paymentFrequency, amount: monthlyPaymentRaw / 2}
 
-  pmi = typeof pmi === 'object' ? pmi.true : pmi
-
   const isMonthly = paymentFrequency.type === 'Monthly' ? true : false
-  const {formatted: homeValue} = unformat(hv)
 
   const monthlyOrBiWeeklyPayment = monthlyOrBiWeekly.payment
-  propertyTax = isMonthly ? propertyTax / 12 : propertyTax / 26
-  homeInsurance = isMonthly ? homeInsurance / 12 : homeInsurance / 26
-  pmi = isMonthly ? (mortgageAmount * pmi) / 100 / 12 : (mortgageAmount * pmi) / 100 / 26
+  propertyTax = isMonthly ? propertyTax.amount / 12 : propertyTax.amount / 26
+  homeInsurance = isMonthly ? homeInsurance.amount / 12 : homeInsurance.amount / 26
+  pmi = isMonthly ? pmi.amount / 12 : pmi.amount / 26
   hoaFees = isMonthly ? hoaFees : (hoaFees * 12) / 26
 
   const totalPaymentMonthly =
     paymentFrequency.amount + monthlyOrBiWeeklyPayment + propertyTax + homeInsurance + pmi + hoaFees
-  const downPayment = homeValue - mortgageAmount // PMI not required if downpayment is 20%
   const pmiThreshhold = homeValue - homeValue * 0.2 // downpayment and loan princiapl paid reach 20% stop pmi
 
   const {totalExtraPayment, months, totalInterest, pmiDuration} = calculateExtraPaymentsAndInterest(
@@ -65,12 +62,13 @@ export default data => {
   const totalHoaFees = hoaFees * (months - totalFessMonths)
   const totalFees = totalTax + totalInsurance + totalPMI + totalHoaFees
 
-  const totalAllPayments = totalFees + totalInterest + mortgageAmount + downPayment
+  // PMI not required if downpayment is 20%
+  const totalAllPayments = totalFees + totalInterest + mortgageAmount + downPayment.amount
 
   return [
     {
       label: 'Home Value',
-      value: hv,
+      value: homeValue,
       id: 11,
     },
     {
@@ -140,7 +138,7 @@ export default data => {
     },
     {
       label: 'Down Payment',
-      value: downPayment,
+      value: downPayment.amount,
       id: 23,
     },
     {

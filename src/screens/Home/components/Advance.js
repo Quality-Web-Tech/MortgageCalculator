@@ -234,6 +234,7 @@ export default function Home() {
             </InputSwitch>
 
             <InputSwitch
+              initialState={false}
               state={{
                 true: 'percent',
                 false: 'amount',
