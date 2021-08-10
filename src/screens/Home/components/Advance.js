@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {Keyboard, TouchableWithoutFeedback, View, Text, ScrollView} from 'react-native'
+import {Keyboard, TouchableWithoutFeedback, Text, ScrollView} from 'react-native'
 import colors from 'styles/colors'
 import {FontAwesome5} from '@expo/vector-icons'
 import variables from 'styles/variables'
@@ -8,7 +8,6 @@ import LoanTerm from './LoanTerm'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
 import {
   useAdvanceDispatchMortgageCalculator,
-  useAdvanceStateMortgageCalculator,
   updateHomeValue,
   updateDownPayment,
   updateMortgageAmount,
@@ -32,10 +31,37 @@ import fontFamily from '../../../styles/fontFamily'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import InputSwitch from './InputSwitch'
 import {handleInputIncon} from './helper'
+import ExtraPeyment from './ExtraPayments'
+
+const extraPayments = [
+  {
+    key: 'oneTime',
+    rightLabel: 'One Time',
+    leftLabeL: 'On',
+    dispatcher: updateOneTimePayment,
+  },
+  {
+    key: 'monthlyOrBiWeekly',
+    rightLabel: 'Monthly or Bi-Weekly',
+    leftLabeL: 'Starting',
+    dispatcher: updateBiWeeklyOrMonthlyPayment,
+  },
+  {
+    key: 'quarterly',
+    rightLabel: 'Quarterly',
+    leftLabeL: 'Starting',
+    dispatcher: updateQuarterlyPayment,
+  },
+  {
+    key: 'yearly',
+    rightLabel: 'Yearly',
+    leftLabeL: 'Starting',
+    dispatcher: updateYearlyPayment,
+  },
+]
 
 export default function Home() {
   const dispatch = useAdvanceDispatchMortgageCalculator()
-  const state = useAdvanceStateMortgageCalculator()
 
   const [form, setForm] = useState(INITIAL_STATE)
   const [inputWithDate, setInputWithDate] = useState()
@@ -318,111 +344,21 @@ export default function Home() {
             <Text style={{fontFamily: fontFamily.MONTSERRAT_BOLD, color: colors.gray600, marginVertical: 16}}>
               EXTRA PAYMENT
             </Text>
-
-            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <TextInput
-                containerStyle={{width: '45%'}}
-                value={formatNumber(form.oneTime.payment)}
-                label="One Time"
-                keyboardType="decimal-pad"
-                icon={handleInputIncon(1)}
-                onChangeText={payment =>
-                  handleOnChangeText('oneTime', {oneTime: {...form.oneTime, payment}}, updateOneTimePayment)
-                }
-              />
-
-              <TextInput
-                containerStyle={{width: '45%'}}
-                inputPressableStyle={{fontSize: 12}}
-                reverse
-                clickable={true}
-                value={formatDate(form.oneTime.startDate)}
-                label="On"
-                icon={handleInputIncon(2)}
-                onPress={() => showDatePicker('oneTime', updateOneTimePayment)}
-              />
-            </View>
-
-            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <TextInput
-                containerStyle={{width: '45%'}}
-                value={formatNumber(form.monthlyOrBiWeekly.payment)}
-                label="Monthly or Bi-Weekly"
-                keyboardType="decimal-pad"
-                icon={handleInputIncon(1)}
-                onChangeText={payment =>
+            {extraPayments.map(payment => (
+              <ExtraPeyment
+                key={payment.key}
+                data={payment}
+                form={form}
+                onDateSelect={() => showDatePicker(payment.key, payment.dispatcher)}
+                handleOnChangeText={value =>
                   handleOnChangeText(
-                    'monthlyOrBiWeekly',
-                    {monthlyOrBiWeekly: {...form.monthlyOrBiWeekly, payment}},
-                    updateBiWeeklyOrMonthlyPayment,
+                    payment.key,
+                    {[payment.key]: {...form[payment.key], payment: value}},
+                    payment.dispatcher,
                   )
                 }
               />
-
-              <TextInput
-                containerStyle={{width: '45%'}}
-                inputPressableStyle={{fontSize: 12}}
-                reverse
-                clickable={true}
-                value={formatDate(form.monthlyOrBiWeekly.startDate)}
-                label="Starting"
-                icon={handleInputIncon(2)}
-                onPress={() => showDatePicker('monthlyOrBiWeekly', updateBiWeeklyOrMonthlyPayment)}
-              />
-            </View>
-
-            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <TextInput
-                containerStyle={{width: '45%'}}
-                value={formatNumber(form.quarterly.payment)}
-                label="Quarterly"
-                keyboardType="decimal-pad"
-                icon={handleInputIncon(1)}
-                onChangeText={payment =>
-                  handleOnChangeText('quarterly', {quarterly: {...form.quarterly, payment}}, updateQuarterlyPayment)
-                }
-              />
-              <TextInput
-                containerStyle={{width: '45%'}}
-                inputPressableStyle={{fontSize: 12}}
-                reverse
-                clickable={true}
-                value={formatDate(form.quarterly.startDate) || ''}
-                label="Starting"
-                icon={handleInputIncon(2)}
-                onPress={() => showDatePicker('quarterly', updateQuarterlyPayment)}
-              />
-            </View>
-
-            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <TextInput
-                containerStyle={{width: '45%'}}
-                value={formatNumber(form.yearly.payment) || ''}
-                label="Yearly"
-                keyboardType="decimal-pad"
-                icon={handleInputIncon(1)}
-                onChangeText={payment =>
-                  handleOnChangeText(
-                    'yearly',
-                    {
-                      yearly: {...form.yearly, payment},
-                    },
-                    updateYearlyPayment,
-                  )
-                }
-              />
-              <TextInput
-                containerStyle={{width: '45%'}}
-                inputPressableStyle={{fontSize: 12}}
-                reverse
-                clickable={true}
-                value={formatDate(form.yearly.startDate)}
-                label="Starting"
-                icon={handleInputIncon(2)}
-                onPress={() => showDatePicker('yearly', updateYearlyPayment)}
-              />
-            </View>
-
+            ))}
             <DateTimePickerModal
               isVisible={isDatePickerVisible}
               mode="date"
