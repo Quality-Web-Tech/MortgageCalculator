@@ -50,14 +50,14 @@ const getExtraPaymentsAndInterest = (
   let months = type === 'Monthly' ? loanTerm.months : loanTerm.years * 26
   const interest = type === 'Monthly' ? interestPerType : (interestPerType * 12) / 26
 
-  while (n < months && balance >= 0) {
+  while (n < months) {
     let newInterest = balance * interest // interest based on balance
     let principal = amount - newInterest // principal that goes to balance
 
     // break if we can pay balance
     if (principal >= balance) {
       totalInterest += newInterest
-
+      // console.log(balance, totalInterest, newInterest)
       n += 1
       break
     }

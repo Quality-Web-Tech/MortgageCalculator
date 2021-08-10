@@ -26,6 +26,7 @@ export default data => {
   const isMonthly = paymentFrequency.type === 'Monthly' ? true : false
   const monthlyOrBiWeeklyPayment = monthlyOrBiWeekly.payment
   propertyTax = isMonthly ? propertyTax.amount / 12 : propertyTax.amount / 26
+
   homeInsurance = isMonthly ? homeInsurance.amount / 12 : homeInsurance.amount / 26
 
   pmi =
@@ -56,7 +57,7 @@ export default data => {
 
   const endDate = moment(startDate).add(isMonthly ? months - 1 : Math.ceil((months / 26) * 12) - 2, 'months') // Subracted extra month
 
-  const totalFessMonths = isMonthly ? 0 : 2
+  const totalFessMonths = isMonthly ? 0 : 1
   const totalTax = propertyTax * (months - totalFessMonths) // - 2 is an extra month being added to the calculateExtraPaymentsAndInterest
   const totalInsurance = homeInsurance * (months - totalFessMonths)
   const totalPMI = pmi * pmiDuration // Default value is 45 months, Biweel is 73
@@ -101,7 +102,7 @@ export default data => {
       label: `${paymentFrequency.type} PMI (Until ${moment(new Date())
         .add(pmiDuration - 1, 'months')
         .format('MMM, YYYY')})`,
-      alert: 'PMI not required',
+      alert: downPayment.percent < 20 ? '' : 'PMI not required',
       value: pmi,
       id: 17,
     },
