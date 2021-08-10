@@ -9,8 +9,6 @@ const calcPercentage = (total, val) => Number(((val / total) * 100).toFixed(2))
 
 export default data => {
   let {
-    homeValue: hv,
-    monthlyPaymentRaw,
     paymentFrequency,
     mortgageAmount, // 12 months per year, monthly interest
     interest,
@@ -20,31 +18,16 @@ export default data => {
     homeInsurance,
     pmi,
     hoaFees,
-    startDate,
+    downPayment,
     oneTime,
     quarterly,
     yearly,
   } = data
 
-  paymentFrequency =
-    paymentFrequency === 'Monthly'
-      ? {type: paymentFrequency, amount: monthlyPaymentRaw}
-      : {type: paymentFrequency, amount: monthlyPaymentRaw / 2}
-
-  pmi = typeof pmi === 'object' ? pmi.true : pmi
-
-  const {formatted: homeValue} = unformat(hv)
-
-  const monthlyOrBiWeeklyPayment = monthlyOrBiWeekly.payment
-  propertyTax = paymentFrequency.type === 'Monthly' ? propertyTax / 12 : propertyTax / 12 / 2
-  homeInsurance = paymentFrequency.type === 'Monthly' ? homeInsurance / 12 : homeInsurance / 12 / 2
-  pmi = paymentFrequency.type === 'Monthly' ? (mortgageAmount * pmi) / 100 / 12 : (homeValue * pmi) / 100 / 12 / 2
+  propertyTax = paymentFrequency.type === 'Monthly' ? propertyTax.amount / 12 : propertyTax.amount / 12 / 2
+  homeInsurance = paymentFrequency.type === 'Monthly' ? homeInsurance.amount / 12 : homeInsurance.amount / 12 / 2
+  pmi = paymentFrequency.type === 'Monthly' ? pmi.amount / 12 : pmi.amount / 12 / 2
   hoaFees = paymentFrequency.type === 'Monthly' ? hoaFees : hoaFees / 2
-
-  const totalPaymentMonthly =
-    paymentFrequency.amount + monthlyOrBiWeeklyPayment + propertyTax + homeInsurance + pmi + hoaFees
-  const endDate = moment(startDate).add(loanTerm.years, 'years')
-  const downPayment = homeValue - mortgageAmount
 
   const totalExtraPaymentAndInterest = calculateExtraPaymentsAndInterest(
     paymentFrequency,
@@ -63,13 +46,13 @@ export default data => {
   const totalInsurance = homeInsurance * totalExtraPaymentAndInterest.months
   const totalPMI = pmi * 45 // Default value is 44 months. In the actual app the default is 44 months
   const totalFees = totalTax + totalInsurance + totalPMI + hoaFees * loanTerm.months
-  const totalAllPayments = totalFees + totalExtraPaymentAndInterest.totalInterest + mortgageAmount + downPayment
+  const totalAllPayments = totalFees + totalExtraPaymentAndInterest.totalInterest + mortgageAmount + downPayment.amount
 
   const interestPrincipalPercentage = []
 
   const principalPercent = calcPercentage(totalAllPayments, principal)
   const interestPercent = calcPercentage(totalAllPayments, totalExtraPaymentAndInterest.totalInterest)
-  const downPaymentPercent = calcPercentage(totalAllPayments, downPayment)
+  const downPaymentPercent = calcPercentage(totalAllPayments, downPayment.amount)
   const totalFeesPercent = calcPercentage(totalAllPayments, totalFees)
 
   interestPrincipalPercentage.push({
@@ -90,7 +73,7 @@ export default data => {
   interestPrincipalPercentage.push({
     label: `Down Payment`,
     percent: downPaymentPercent,
-    total: downPayment,
+    total: downPayment.amount,
     icon: <Fontisto name="wallet" color={colors.cyan} size={18} />,
     color: colors.cyan,
   })

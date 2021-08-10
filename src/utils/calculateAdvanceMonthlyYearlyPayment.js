@@ -26,9 +26,8 @@ const dataForYear = (currentYear, yearInterest, yearPrincipal, totalExtraYearPay
 }
 
 const calcMonthlyAndYearly = data => {
-  const copyData = {...data}
   let {
-    mortgageAmount: principal,
+    mortgageAmount: balance,
     interest,
     loanTerm,
     startDate,
@@ -37,15 +36,14 @@ const calcMonthlyAndYearly = data => {
     monthlyOrBiWeekly,
     quarterly,
     yearly,
-  } = copyData
+  } = data
 
-  let balance = Number(principal)
   interest /= 1200 // 12 months per year, monthly interest
   let term = loanTerm.months //* 12
   let n = 0 // variable to keep track each months
 
   const [monthlyPayment, pmiMonthly] = calulateTotalMonthlyPayments(data, 'pmi')
-
+  console.log(monthlyPayment, pmiMonthly)
   let startMonth = startDate.getMonth()
   let currentYear = startDate.getFullYear()
 
@@ -73,7 +71,6 @@ const calcMonthlyAndYearly = data => {
   let yearTotal = 0
   let yearOthers = 0
 
-  let monthPrincipal = 0
   let monthTotal = 0
   let monthOthers = 0
 
@@ -126,7 +123,6 @@ const calcMonthlyAndYearly = data => {
     yearOthers += othersFess
     yearTotal = yearInterest + yearPrincipal + yearOthers + totalExtraYearPayments // overall total fees
 
-    monthPrincipal += mmip
     monthOthers = othersFess
     monthTotal = monthOthers + mmip + ip
 
@@ -194,7 +190,6 @@ const calcMonthlyAndYearly = data => {
       yearPrincipal = 0
       totalExtraYearPayments = 0
       previousYearPrincipal = 0
-      monthPrincipal = 0
       yearOthers = 0
       startMonth = 0
       currentYear += 1

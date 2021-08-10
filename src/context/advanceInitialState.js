@@ -1,5 +1,3 @@
-import {calculateMonthlyPaymentRaw} from '../utils/calculateMonthlyPayment'
-
 // export default {
 //   homeValue: 300000,
 //   downPayment: 45000,
@@ -68,7 +66,7 @@ export const INITIAL_STATE = {
     amount: 1500,
   },
   hoaFees: 0,
-  paymentFrequency: 'Monthly',
+  paymentFrequency: {type: 'Monthly', amount: 1368.8951386809565},
   startDate: new Date(),
   oneTime: {
     payment: 0,
@@ -86,9 +84,5 @@ export const INITIAL_STATE = {
     payment: 0,
     startDate: new Date(),
   },
-  monthlyPaymentRaw: calculateMonthlyPaymentRaw({
-    mortgageAmount: 255000,
-    interest: 5 / 100 / 12, // 5%
-    loanTerm: 360,
-  }),
+  monthlyPaymentRaw: 1368.8951386809565,
 }

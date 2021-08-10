@@ -1,11 +1,10 @@
 import calculateExtraPaymentsAndInterest from './calculateExtraPaymentAndInterest'
-import {unformat, formatDate} from '../utils/formatter'
+import {formatDate} from '../utils/formatter'
 import moment from 'moment'
 
 export default data => {
   let {
     homeValue,
-    monthlyPaymentRaw,
     paymentFrequency,
     mortgageAmount,
     interest,
@@ -21,11 +20,6 @@ export default data => {
     yearly,
     downPayment,
   } = data
-
-  paymentFrequency =
-    paymentFrequency === 'Monthly'
-      ? {type: paymentFrequency, amount: monthlyPaymentRaw}
-      : {type: paymentFrequency, amount: monthlyPaymentRaw / 2}
 
   const isMonthly = paymentFrequency.type === 'Monthly' ? true : false
 

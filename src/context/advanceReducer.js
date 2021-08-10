@@ -100,7 +100,6 @@ export default (state, action) => {
         homeInsurance: {amount, percent},
       } = action.homeInsurance
 
-      console.log(amount, percent)
       return {
         ...state,
         homeInsurance: {
@@ -118,9 +117,19 @@ export default (state, action) => {
     }
 
     case 'UPDATE_PAYMENTFREQUENCY': {
+      const {
+        mortgageAmount,
+        interest,
+        loanTerm: {months},
+      } = state.advance
+      const monthlyPaymentRaw = calculateMonthlyPaymentRaw(mortgageAmount, interest, months)
+      const {paymentFrequency} = action
       return {
         ...state,
-        paymentFrequency: action.paymentFrequency,
+        paymentFrequency: {
+          type: paymentFrequency,
+          amount: paymentFrequency === 'Monthly' ? monthlyPaymentRaw : monthlyPaymentRaw / 2,
+        },
       }
     }
 
