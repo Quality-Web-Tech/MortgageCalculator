@@ -24,11 +24,16 @@ export default data => {
 
   const paymentFrequency = calculateMonthlyPayment(payFrequency, mortgageAmount, interest, loanTerm.months)
   const isMonthly = paymentFrequency.type === 'Monthly' ? true : false
-
   const monthlyOrBiWeeklyPayment = monthlyOrBiWeekly.payment
   propertyTax = isMonthly ? propertyTax.amount / 12 : propertyTax.amount / 26
   homeInsurance = isMonthly ? homeInsurance.amount / 12 : homeInsurance.amount / 26
-  pmi = isMonthly ? pmi.amount / 12 : pmi.amount / 26
+
+  pmi =
+    downPayment.percent < 20
+      ? isMonthly
+        ? (mortgageAmount * pmi.percent) / 1200
+        : (mortgageAmount * pmi.percent) / 2600
+      : 0
   hoaFees = isMonthly ? hoaFees : (hoaFees * 12) / 26
 
   const totalPaymentMonthly =
@@ -96,6 +101,7 @@ export default data => {
       label: `${paymentFrequency.type} PMI (Until ${moment(new Date())
         .add(pmiDuration - 1, 'months')
         .format('MMM, YYYY')})`,
+      alert: 'PMI not required',
       value: pmi,
       id: 17,
     },

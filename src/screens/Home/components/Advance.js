@@ -178,8 +178,9 @@ export default function Home() {
               value={formatNumber(form.mortgageAmount)}
               icon={handleInputIncon(1)}
               onChangeText={value => {
-                const {homeValue} = form
+                const {homeValue: hv} = form
                 const numValue = unformat(value)
+                const homeValue = unformat(hv)
                 const percent = (100 - (numValue / homeValue) * 100).toFixed(2)
 
                 handleOnChangeText(
@@ -187,7 +188,7 @@ export default function Home() {
                   {
                     mortgageAmount: numValue,
                     downPayment: {
-                      amount: homeValue - homeValue * (percent - 100),
+                      amount: Math.abs(homeValue * (percent / 100)),
                       percent,
                     },
                   },
@@ -303,12 +304,13 @@ export default function Home() {
                 valueSetter={type => formatNumber(form.homeInsurance[type])}
                 onChangeText={(value, type) => {
                   const numValue = unformat(value)
+                  const homeValue = unformat(form.homeValue)
                   handleOnChangeText(
                     'homeInsurance',
                     {
                       homeInsurance: {
-                        percent: type === 'percent' ? value : ((numValue / form.homeValue) * 100).toFixed(2),
-                        amount: type === 'amount' ? value : (numValue / 100) * form.homeValue,
+                        percent: type === 'percent' ? value : ((numValue / homeValue) * 100).toFixed(2),
+                        amount: type === 'amount' ? value : (numValue / 100) * Number(homeValue),
                       },
                     },
                     updateHomeInsurance,

@@ -15,7 +15,7 @@ function Detail() {
   return (
     <Container>
       <ScrollView>
-        {data.map(({label, value, mantissa = 2, icon = true, dates, date, id}) => {
+        {data.map(({label, value, mantissa = 2, icon = true, dates, date, id, alert}) => {
           return date ? (
             <View style={{flexDirection: 'row', justifyContent: 'space-between'}} key={id}>
               {dates.map(({label, value}) => (
@@ -34,9 +34,9 @@ function Detail() {
               key={id}
               label={label}
               editable={false}
-              value={numbro(value).format({thousandSeparated: true, mantissa})}
+              value={alert || numbro(value).format({thousandSeparated: true, mantissa})}
               icon={
-                icon ? (
+                icon && !alert ? (
                   <MaterialIcons name="attach-money" size={variables.iconSizeMedium} color={colors.gray400} />
                 ) : null
               }
