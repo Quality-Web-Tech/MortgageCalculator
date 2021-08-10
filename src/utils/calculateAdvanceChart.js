@@ -2,14 +2,13 @@ import React from 'react'
 import calculateExtraPaymentsAndInterest from './calculateExtraPaymentAndInterest'
 import {FontAwesome5, MaterialCommunityIcons, Fontisto} from '@expo/vector-icons'
 import colors from '../styles/colors'
-import moment from 'moment'
-import {unformat} from '../utils/formatter'
+import {calculateMonthlyPayment} from '../utils/calculateMonthlyPayment'
 
 const calcPercentage = (total, val) => Number(((val / total) * 100).toFixed(2))
 
 export default data => {
   let {
-    paymentFrequency,
+    paymentFrequency: payFrequency,
     mortgageAmount, // 12 months per year, monthly interest
     interest,
     loanTerm,
@@ -23,6 +22,7 @@ export default data => {
     quarterly,
     yearly,
   } = data
+  const paymentFrequency = calculateMonthlyPayment(payFrequency, mortgageAmount, interest, loanTerm.months)
 
   propertyTax = paymentFrequency.type === 'Monthly' ? propertyTax.amount / 12 : propertyTax.amount / 12 / 2
   homeInsurance = paymentFrequency.type === 'Monthly' ? homeInsurance.amount / 12 : homeInsurance.amount / 12 / 2

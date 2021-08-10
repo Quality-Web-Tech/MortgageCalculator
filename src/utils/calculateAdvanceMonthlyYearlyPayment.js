@@ -43,7 +43,7 @@ const calcMonthlyAndYearly = data => {
   let n = 0 // variable to keep track each months
 
   const [monthlyPayment, pmiMonthly] = calulateTotalMonthlyPayments(data, 'pmi')
-  console.log(monthlyPayment, pmiMonthly)
+
   let startMonth = startDate.getMonth()
   let currentYear = startDate.getFullYear()
 
