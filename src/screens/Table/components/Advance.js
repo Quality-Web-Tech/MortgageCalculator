@@ -11,21 +11,29 @@ const headerFontSize = (width, size) => {
   return {fontSize: size}
 }
 
+const listHeaderLabel = ['DATE', 'INTEREST', 'PRINCIPAL', 'EXTRA', 'OTHERS', 'TOTAL', 'BALANCE']
+
 function ListHeader({term}) {
   const screenWidth = useWindowDimensions().width
   const headerFontSizeStyle = headerFontSize(screenWidth, 11)
 
   return (
     <View style={[styles.listTableHeaderContainer]}>
-      <Text style={[styles.listTableHeader, term === 'year' ? {width: 50} : {width: 75}, headerFontSizeStyle]}>
-        {term === 'year' ? 'DATE' : 'ALL'}
-      </Text>
-      <Text style={[styles.listTableHeader, {flex: 1}, headerFontSizeStyle]}>INTEREST</Text>
-      <Text style={[styles.listTableHeader, {flex: 1}, headerFontSizeStyle]}>PRINCIPAL</Text>
-      <Text style={[styles.listTableHeader, {flex: 1, textAlign: 'center'}, headerFontSizeStyle]}>Extra</Text>
-      <Text style={[styles.listTableHeader, {flex: 1}, headerFontSizeStyle]}>OTHERS</Text>
-      <Text style={[styles.listTableHeader, {flex: 1}, headerFontSizeStyle]}>TOTAL</Text>
-      <Text style={[styles.listTableHeader, {flex: 1}, headerFontSizeStyle]}>BALANCE</Text>
+      {listHeaderLabel.map((label, index) => {
+        return (
+          <Text
+            key={'header' + index}
+            style={[
+              styles.listTableHeader,
+              index && {flex: 1},
+              term === 'year' ? {width: 50} : {width: 75},
+              headerFontSizeStyle,
+            ]}
+          >
+            {label}
+          </Text>
+        )
+      })}
     </View>
   )
 }
@@ -33,21 +41,26 @@ ListHeader = React.memo(ListHeader)
 
 function ListItem({term, data}) {
   const {label, interest, principal, total, balance, others, extraPayment} = data
+  const lists = [label, interest, principal, extraPayment, others, total, balance]
   const screenWidth = useWindowDimensions().width
   const headerFontSizeStyle = headerFontSize(screenWidth, 12)
   return (
     <View style={styles.listItemTableContainer}>
-      <Text style={[styles.listItemTable, term === 'year' ? {width: 50} : {width: 75}, headerFontSizeStyle]}>
-        {label}
-      </Text>
-      <Text style={[styles.listItemTable, {flex: 1}, headerFontSizeStyle]}>${formatNumber(interest)}</Text>
-      <Text style={[styles.listItemTable, {flex: 1}, headerFontSizeStyle]}>${formatNumber(principal)}</Text>
-      <Text style={[styles.listItemTable, {flex: 1, textAlign: 'center'}, headerFontSizeStyle]}>
-        ${formatNumber(extraPayment)}
-      </Text>
-      <Text style={[styles.listItemTable, {flex: 1}, headerFontSizeStyle]}>${formatNumber(others)}</Text>
-      <Text style={[styles.listItemTable, {flex: 1}, headerFontSizeStyle]}>${formatNumber(total)}</Text>
-      <Text style={[styles.listItemTable, {flex: 1}, headerFontSizeStyle]}>${formatNumber(balance)}</Text>
+      {lists.map((list, index) => {
+        return (
+          <Text
+            key={'list' + index}
+            style={[
+              styles.listItemTable,
+              index && {flex: 1},
+              term === 'year' ? {width: 50} : {width: 75},
+              headerFontSizeStyle,
+            ]}
+          >
+            {!index ? list : formatNumber(list)}
+          </Text>
+        )
+      })}
     </View>
   )
 }
@@ -71,7 +84,7 @@ function Table() {
       />
       <ScrollView horizontal={true}>
         <FlatList
-          contentContainerStyle={{width: term === 'year' ? 520 : 560}}
+          contentContainerStyle={{width: term === 'year' ? 530 : 560}}
           listItem={item => <ListItem term={term} data={item} />}
           data={tableData[term]}
           numColumns={1}
