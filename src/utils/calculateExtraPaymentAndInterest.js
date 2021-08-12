@@ -48,7 +48,7 @@ const getExtraPaymentsAndInterest = (
   const diffMonthsForQuarterly = qDate.diff(startDate, isWeeksOrMonths) // assume that the start date is Today!
   const diffMonthsForYearly = yDate.diff(startDate, isWeeksOrMonths) // assume that the start date is Today!
 
-  const t0 = performance.now()
+  // const t0 = performance.now()
 
   const interest = isMonthly ? interestPerType : (interestPerType * 12) / 26
 
@@ -222,8 +222,8 @@ const getExtraPaymentsAndInterest = (
     }
   }
 
-  const t1 = performance.now()
-  console.log(t1 - t0, 'milliseconds')
+  // const t1 = performance.now()
+  // console.log(t1 - t0, 'milliseconds')
   return {totalInterest: totalInterest, totalExtraPayment, months: numberOfPayments, pmiDuration: pmiEndDate}
 }
 
