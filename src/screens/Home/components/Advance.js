@@ -37,25 +37,25 @@ const extraPayments = [
   {
     key: 'oneTime',
     rightLabel: 'One Time',
-    leftLabeL: 'On',
+    leftLabel: 'On',
     dispatcher: updateOneTimePayment,
   },
   {
     key: 'monthlyOrBiWeekly',
     rightLabel: 'Monthly or Bi-Weekly',
-    leftLabeL: 'Starting',
+    leftLabel: 'Starting',
     dispatcher: updateBiWeeklyOrMonthlyPayment,
   },
   {
     key: 'quarterly',
     rightLabel: 'Quarterly',
-    leftLabeL: 'Starting',
+    leftLabel: 'Starting',
     dispatcher: updateQuarterlyPayment,
   },
   {
     key: 'yearly',
     rightLabel: 'Yearly',
-    leftLabeL: 'Starting',
+    leftLabel: 'Starting',
     dispatcher: updateYearlyPayment,
   },
 ]

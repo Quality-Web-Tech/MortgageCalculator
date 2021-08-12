@@ -10,7 +10,7 @@ export default function ExtraPeyment({form, data, onDateSelect, handleOnChangeTe
       <TextInput
         containerStyle={{width: '45%'}}
         value={formatNumber(form[data.key].payment)}
-        label={data.leftLabel}
+        label={data.rightLabel}
         keyboardType="decimal-pad"
         icon={handleInputIncon(1)}
         onChangeText={handleOnChangeText}
@@ -22,7 +22,7 @@ export default function ExtraPeyment({form, data, onDateSelect, handleOnChangeTe
         reverse
         clickable={true}
         value={formatDate(form[data.key].startDate)}
-        label={data.rightLabel}
+        label={data.leftLabel}
         icon={handleInputIncon(2)}
         onPress={onDateSelect}
       />
