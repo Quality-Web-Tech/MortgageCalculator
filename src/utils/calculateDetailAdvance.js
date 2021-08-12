@@ -51,20 +51,21 @@ export default data => {
     quarterly,
     yearly,
     pmiThreshhold,
+    startDate,
   )
 
   const principal = mortgageAmount - totalExtraPayment
 
-  const endDate = moment(startDate).add(isMonthly ? months - 1 : Math.ceil((months / 26) * 12) - 2, 'months') // Subracted extra month
+  const endDateEx = isMonthly ? months : Math.floor((months / 26) * 12) - 1
+  const endDate = moment(startDate).add(endDateEx, 'months') // Subracted extra month
 
-  const totalFessMonths = isMonthly ? 0 : 1
-  const totalTax = propertyTax * (months - totalFessMonths) // - 2 is an extra month being added to the calculateExtraPaymentsAndInterest
+  const totalFessMonths = isMonthly ? 0 : 2
+
+  const totalTax = propertyTax * (months - totalFessMonths)
   const totalInsurance = homeInsurance * (months - totalFessMonths)
-  const totalPMI = pmi * pmiDuration // Default value is 45 months, Biweel is 73
-  const totalHoaFees = hoaFees * (months - totalFessMonths)
-  const totalFees = totalTax + totalInsurance + totalPMI + totalHoaFees
-
-  // PMI not required if downpayment is 20%
+  const totalPMI = pmi * pmiDuration
+  const totalHoaFees = hoaFees * months
+  const totalFees = totalTax + totalInsurance + totalPMI + totalHoaFees // PMI not required if downpayment is 20%
   const totalAllPayments = totalFees + totalInterest + mortgageAmount + downPayment.amount
 
   return [

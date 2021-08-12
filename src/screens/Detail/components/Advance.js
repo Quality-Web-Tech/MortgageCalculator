@@ -10,6 +10,7 @@ import numbro from 'numbro'
 
 function Detail() {
   const advance = useAdvanceStateMortgageCalculator()
+
   const data = calculateDetailAdvance(advance)
 
   return (
