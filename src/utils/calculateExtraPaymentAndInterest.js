@@ -59,8 +59,8 @@ const getExtraPaymentsAndInterest = (
       if (diffO === n && oPayment) addPaymentToExtra(oPayment)
       if (diffB <= n && bPayment) addPaymentToExtra(bPayment)
       if (diffQ === n && qPayment) addPaymentToExtra(qPayment)
-      if (diffY === n && yPayment) addPaymentToExtra(yPayment)
       if (diffQ < n && (n - diffQ) % 3 === 0 && qPayment) addPaymentToExtra(qPayment)
+      if (diffY === n && yPayment) addPaymentToExtra(yPayment)
       if (diffY < n && (n - diffY) % 12 === 0 && yPayment) addPaymentToExtra(yPayment)
 
       // subract any extra payments if balance is paid
@@ -123,6 +123,7 @@ const getExtraPaymentsAndInterest = (
       if (diffBWO === n && isSame(cbw, oDate) && oPayment) addPaymentToExtra(oPayment)
       if (diffBWO === n && !isSame(cbw, oDate) && oPayment) recalculate(oPayment)
       if (diffBWB <= n && bPayment) addPaymentToExtra(bPayment)
+
       if (!qNextPayment && diffBWQ === n && isSame(cbw, qDate) && qPayment)
         addPaymentToExtra(qPayment, setNextQuarterPayment)
       if (!qNextPayment && diffBWQ === n && !isSame(cbw, qDate) && qPayment)
@@ -152,9 +153,16 @@ const getExtraPaymentsAndInterest = (
       n += 1
       numberOfPayments = n
     }
-
-    numberOfPayments += extraPaymentCounter
   }
+
+  // TODO: Fix number of payments involving with extra payments
+  pmiEndDate = isMonthly
+    ? pmiEndDate
+    : !isMonthly && qPayment
+    ? yPayment
+      ? pmiEndDate - 1
+      : pmiEndDate - 2
+    : pmiEndDate - 1
 
   return {totalInterest: totalInterest, totalExtraPayment, months: numberOfPayments, pmiDuration: pmiEndDate}
 }

@@ -58,12 +58,12 @@ export default data => {
   const endDateEx = isMonthly ? months : Math.floor((months / 26) * 12) - 1
   const endDate = moment(startDate).add(endDateEx, 'months') // Subracted extra month
 
-  const totalFessMonths = isMonthly ? 0 : 2
+  const totalFessMonths = isMonthly ? 0 : 3
 
   const totalTax = propertyTax * (months - totalFessMonths)
   const totalInsurance = homeInsurance * (months - totalFessMonths)
   const totalPMI = pmi * pmiDuration
-  const totalHoaFees = hoaFees * months
+  const totalHoaFees = hoaFees * (months - totalFessMonths)
   const totalFees = totalTax + totalInsurance + totalPMI + totalHoaFees // PMI not required if downpayment is 20%
   const totalAllPayments = totalFees + totalInterest + mortgageAmount + downPayment.amount
 

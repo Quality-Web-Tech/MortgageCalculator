@@ -10,6 +10,8 @@ export function weekDiff(dateFrom, dateTo) {
 
 export const getNextBiWeek = (date, freq) => new Date(date + 12096e5 * freq)
 
+export const getNextQuaterlyMonth = date => new Date(date.getFullYear(), date.getMonth() + 3, date.getDate())
+
 export const getNextYear = date => new Date(date.getFullYear() + 1, date.getMonth(), date.getDate())
 
 export const isSame = (d1, d2) =>
