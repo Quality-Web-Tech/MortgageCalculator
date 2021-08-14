@@ -10,7 +10,7 @@ export const StackNavigator = ({navigation}) => {
   return (
     <Stack.Navigator headerMode="screen">
       <Stack.Screen
-        name="AdvanceHome"
+        name="Home"
         component={TopTabNavigator}
         options={{
           swipeEnabled: true,
@@ -28,7 +28,7 @@ export const StackNavigator = ({navigation}) => {
       />
 
       <Stack.Screen
-        name="AdvanceHome1"
+        name="AdvanceHome"
         component={TopTabNavigator}
         options={{
           headerLeft: null,

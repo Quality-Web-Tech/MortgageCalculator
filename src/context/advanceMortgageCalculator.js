@@ -33,7 +33,6 @@ function useAdvanceDispatchMortgageCalculator() {
   return context
 }
 
-// const updateStateForm = ()
 const updateHomeValue = (homeValue, dispatch) => dispatch({type: 'UPDATE_HOMEVALUE', homeValue})
 const updateDownPayment = (downPayment, dispatch) => dispatch({type: 'UPDATE_DOWNPAYMENT', downPayment})
 const updateMortgageAmount = (mortgageAmount, dispatch) => dispatch({type: 'UPDATE_MORTGAGEAMOUNT', mortgageAmount})
