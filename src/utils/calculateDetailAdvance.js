@@ -45,7 +45,6 @@ export default data => {
     paymentFrequency,
     mortgageAmount,
     interest,
-    loanTerm,
     oneTime,
     monthlyOrBiWeekly,
     quarterly,

@@ -1,10 +1,9 @@
-import moment from 'moment'
+import {monthDiff, getNextYear, getNextQuaterlyMonth, weekDiff, getNextBiWeek, isSame, isAfter} from './helper'
 
 const getExtraPaymentsAndInterest = (
   paymenFrequency,
   p,
   r,
-  loanTerm,
   oneTime,
   biWeekly,
   quarterly,
@@ -18,14 +17,6 @@ const getExtraPaymentsAndInterest = (
   let {payment: qPayment, startDate: qDate} = quarterly
   let {payment: yPayment, startDate: yDate} = yearly
 
-  // if (!oPayment && !bPayment && !qPayment && !yPayment)
-  //   return {totalInterest: defaultTotalInterest, totalExtraPayment: 0, months}
-
-  oPayment = Number(oPayment)
-  bPayment = Number(bPayment)
-  qPayment = Number(qPayment)
-  yPayment = Number(yPayment)
-
   let numberOfPayments = 0
   let totalInterest = 0
   let balance = p // 255000
@@ -34,196 +25,137 @@ const getExtraPaymentsAndInterest = (
   let interestPerType = r / 1200
   let pmiEndDate = 0
 
-  oDate = moment(oDate)
-  bDate = moment(bDate)
-  qDate = moment(qDate)
-  yDate = moment(yDate)
-  startDate = moment(startDate)
-
   const isMonthly = type === 'Monthly' ? true : false
-  const isWeeksOrMonths = isMonthly ? 'months' : 'weeks'
-
-  const diffMonthsForOneTime = oDate.diff(startDate, isWeeksOrMonths)
-  const diffMonthsForBiWeekly = bDate.diff(startDate, isWeeksOrMonths)
-  const diffMonthsForQuarterly = qDate.diff(startDate, isWeeksOrMonths) // assume that the start date is Today!
-  const diffMonthsForYearly = yDate.diff(startDate, isWeeksOrMonths) // assume that the start date is Today!
-
-  // const t0 = performance.now()
-
   const interest = isMonthly ? interestPerType : (interestPerType * 12) / 26
+
+  const calculateInterestAndPrincipal = b => {
+    let newInterest = b * interest // interest based on balance
+    let principal = amount - newInterest // principal that goes to balance
+    return [principal, newInterest]
+  }
+
+  const addPaymentToExtra = (amount, cb = () => null) => {
+    totalExtraPayment += amount
+    extraPayments += amount
+    cb()
+  }
 
   if (isMonthly) {
     let n = 0
+
+    const diffO = monthDiff(startDate, oDate)
+    const diffB = monthDiff(startDate, bDate)
+    const diffQ = monthDiff(startDate, qDate)
+    const diffY = monthDiff(startDate, yDate)
+
     while (balance >= 0) {
-      let newInterest = balance * interest // interest based on balance
-      let principal = amount - newInterest // principal that goes to balance
+      let [principal, newInterest] = calculateInterestAndPrincipal(balance)
 
       // if paid principal is 20% or greater stop paying
       if (pmiThreshhold >= balance && !pmiEndDate) {
         pmiEndDate = n
       }
 
-      if (diffMonthsForOneTime === n && oPayment) {
-        totalExtraPayment += oPayment
-        extraPayments += oPayment
-      }
+      if (diffO === n && oPayment) addPaymentToExtra(oPayment)
+      if (diffB <= n && bPayment) addPaymentToExtra(bPayment)
+      if (diffQ === n && qPayment) addPaymentToExtra(qPayment)
+      if (diffY === n && yPayment) addPaymentToExtra(yPayment)
+      if (diffQ < n && (n - diffQ) % 3 === 0 && qPayment) addPaymentToExtra(qPayment)
+      if (diffY < n && (n - diffY) % 12 === 0 && yPayment) addPaymentToExtra(yPayment)
 
-      if (diffMonthsForBiWeekly <= n && bPayment) {
-        totalExtraPayment += bPayment
-        extraPayments += bPayment
-      }
-
-      if (diffMonthsForQuarterly <= n && n % 3 === 0 && qPayment) {
-        totalExtraPayment += qPayment
-        extraPayments += qPayment
-      }
-
-      if (diffMonthsForYearly <= n && n % 12 === 0 && yPayment) {
-        totalExtraPayment += yPayment
-        extraPayments += yPayment
-      }
-
-      // subract any extra payments
+      // subract any extra payments if balance is paid
       if (principal >= balance) {
         totalExtraPayment -= extraPayments
       }
 
       balance = balance - (principal + extraPayments)
       totalInterest += newInterest
-
-      n += 1
-
       extraPayments = 0
-      numberOfPayments += 1
+      n += 1
+      numberOfPayments = n
     }
   } else {
-    let n = loanTerm.years * 26
-    let i = 0
-    let k = (loanTerm.years * 20) / 4
+    let n = 0
+    let newInterest
+    let principal
+    let extraPaymentCounter = 0
 
-    const oStart = Math.ceil(diffMonthsForOneTime / 2)
-    const bStart = Math.ceil(diffMonthsForBiWeekly / 2)
-    let qStart = Math.ceil(diffMonthsForQuarterly / 2)
-    let yStart = Math.ceil(diffMonthsForYearly / 2)
-    const oSignalToStop = false
+    const diffBWO = weekDiff(startDate, oDate)
+    const diffBWB = weekDiff(startDate, bDate)
+    let diffBWQ = weekDiff(startDate, qDate)
+    let qNextPayment
+    let diffBWY = weekDiff(startDate, yDate)
+    let yNextPayment
 
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    const qData = []
-    const sData = []
-    sData.push(startDate.format('MMM DD, YYYY'))
-    let qStartMonth = qDate.month()
-    const qStartDay = qDate.date()
-    let qStartYear = qDate.year()
-    let qYear = qStartMonth
+    const recalculate = (amount, cb = () => null) => {
+      balance -= amount
+      totalExtraPayment += amount
+      extraPaymentCounter += 1
+      const [p, i] = calculateInterestAndPrincipal(balance)
 
-    if (qPayment) {
-      for (let j = 0; j < k; j++) {
-        if (qYear > 11) {
-          qStartYear += 1
-          qYear = qStartMonth % 12
-        }
-
-        qData.push(`${months[qStartMonth % 12]} ${qStartDay}, ${qStartYear}`)
-
-        qStartMonth += 3
-        qYear += 3
-      }
-
-      const ll = loanTerm.years * 26
-      for (let k = 0; k < ll; k++) {
-        sData.push(startDate.add(2, 'weeks').format('MMM DD, YYYY'))
-      }
+      newInterest = i
+      principal = p
+      cb()
     }
 
-    qData.reverse()
-    // If balance changed re calculate interest!!
-    while (i < n && balance >= 0) {
-      let newInterest = balance * interest // interest based on balance
-      let principal = amount - newInterest // principal that goes to balance
+    const setNextQuarterPayment = () => {
+      qNextPayment = !qNextPayment ? new Date(qDate) : qNextPayment
+      qNextPayment = getNextQuaterlyMonth(qNextPayment)
+    }
+
+    const setNextYearPayment = () => {
+      yNextPayment = !yNextPayment ? new Date(yDate) : yNextPayment
+      yNextPayment = getNextYear(yNextPayment)
+    }
+
+    while (balance >= 0) {
+      let [p, i] = calculateInterestAndPrincipal(balance)
+      principal = p
+      newInterest = i
+
+      const cbw = getNextBiWeek(startDate.getTime(), n)
 
       // if paid principal is 20% or greater stop paying
       if (pmiThreshhold >= balance && !pmiEndDate) {
-        pmiEndDate = i
+        pmiEndDate = n
       }
 
-      if (i === oStart && !oSignalToStop && oPayment) {
-        const copyStartDate = moment(startDate)
-        const copyStartString = copyStartDate.add(i * 2, 'weeks').format('MMM DD, YYYY')
-        const oDateString = oDate.format('MMM DD, YYYY')
+      if (diffBWO === n && isSame(cbw, oDate) && oPayment) addPaymentToExtra(oPayment)
+      if (diffBWO === n && !isSame(cbw, oDate) && oPayment) recalculate(oPayment)
+      if (diffBWB <= n && bPayment) addPaymentToExtra(bPayment)
+      if (!qNextPayment && diffBWQ === n && isSame(cbw, qDate) && qPayment)
+        addPaymentToExtra(qPayment, setNextQuarterPayment)
+      if (!qNextPayment && diffBWQ === n && !isSame(cbw, qDate) && qPayment)
+        recalculate(qPayment, setNextQuarterPayment)
 
-        if (copyStartString !== oDateString) {
-          balance -= principal
-          balance -= oPayment
-          totalInterest += newInterest
-          totalExtraPayment += oPayment
-          oSignalToStop = true
-          continue
-        }
+      // 2025-11-15T07:00:00.000Z 2025-11-14T08:00:00.000Z 229108.01623482723 true, one day is equal isSame(cbw, qNextPayment), it shouldnt
+      if (qNextPayment && isSame(cbw, qNextPayment) && qPayment) addPaymentToExtra(qPayment, setNextQuarterPayment)
+      if (qNextPayment && isAfter(cbw, qNextPayment) && qPayment) recalculate(qPayment, setNextQuarterPayment)
 
-        totalExtraPayment += oPayment
-        extraPayments += oPayment
+      if (!yNextPayment && diffBWY === n && isSame(cbw, yDate) && yPayment)
+        addPaymentToExtra(yPayment, setNextYearPayment)
+      if (!yNextPayment && diffBWY === n && !isSame(cbw, yDate) && yPayment) recalculate(yPayment, setNextYearPayment)
+
+      // 2025-11-15T07:00:00.000Z 2025-11-14T08:00:00.000Z 229108.01623482723 true, one day is equal isSame(cbw, qNextPayment), it shouldnt
+      if (yNextPayment && isSame(cbw, yNextPayment) && yPayment) addPaymentToExtra(yPayment, setNextYearPayment)
+      if (yNextPayment && isAfter(cbw, yNextPayment) && yPayment) recalculate(yPayment, setNextYearPayment)
+
+      // subract any extra payments if balance is paid
+      if (principal >= balance) {
+        totalExtraPayment -= extraPayments
       }
 
-      if (i >= bStart && bPayment) {
-        if (principal >= balance) bPayment = 0
-        totalExtraPayment += bPayment
-        extraPayments += bPayment
-      }
-
-      if (i >= qStart && qPayment) {
-        const np = qData[qData.length - 1]
-        const cb = sData[i]
-
-        if (np === cb) {
-          totalExtraPayment += qPayment
-          extraPayments += qPayment
-          qData.pop()
-          qStart = i + 6
-
-          continue
-        }
-
-        const cc = moment(np) //slow operation
-        const mm = moment(cb) //slow operation
-
-        if (mm.isAfter(cc)) {
-          balance -= qPayment
-          newInterest = balance * interest // recalculate since balance change
-          principal = amount - newInterest // recalculate since balance change
-          totalExtraPayment += qPayment
-
-          qData.pop()
-          qStart = i + 6
-        }
-      }
-
-      if (i % 26 === 0 || (yStart === i && yPayment)) {
-        const sd = moment(startDate)
-          .add(i * 2, 'weeks')
-          .format('MMM DD, YYYY')
-
-        const mm = yDate.add(1, 'year').format('MMM DD, YYYY')
-
-        if (sd === mm) {
-          totalExtraPayment += yPayment
-          extraPayments += yPayment
-        }
-
-        // we know that next iteration is year
-        balance -= yPayment
-      }
-
-      balance -= principal + extraPayments
+      balance = balance - (principal + extraPayments)
       totalInterest += newInterest
       extraPayments = 0
 
-      i += 1
-      numberOfPayments = i
+      n += 1
+      numberOfPayments = n
     }
+
+    numberOfPayments += extraPaymentCounter
   }
 
-  // const t1 = performance.now()
-  // console.log(t1 - t0, 'milliseconds')
   return {totalInterest: totalInterest, totalExtraPayment, months: numberOfPayments, pmiDuration: pmiEndDate}
 }
 
