@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, Text, useWindowDimensions} from 'react-native'
+import {View, Text, useWindowDimensions, ScrollView} from 'react-native'
 import styles from '../../../styles/styles'
 import {Container, Picker, FlatList} from 'components'
 import {useBasicMortgageCalculator} from 'context/basicMortgageCalculator'
@@ -56,13 +56,17 @@ function Table() {
   return (
     <Container>
       <Picker value={term} onChange={setTerm} />
-      <FlatList
-        listItem={item => <ListItem term={term} data={item} />}
-        data={tableData[term]}
-        keyExtractor={item => item.label}
-        ListHeaderComponent={() => <ListHeader term={term} />}
-        horizontal={false}
-      />
+      <ScrollView horizontal={true}>
+        <FlatList
+          contentContainerStyle={{width: 450}}
+          listItem={item => <ListItem term={term} data={item} />}
+          data={tableData[term]}
+          numColumns={1}
+          keyExtractor={item => item.label}
+          ListHeaderComponent={() => <ListHeader term={term} />}
+          horizontal={false}
+        />
+      </ScrollView>
     </Container>
   )
 }
