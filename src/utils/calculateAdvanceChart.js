@@ -21,6 +21,7 @@ export default data => {
     oneTime,
     quarterly,
     yearly,
+    startDate,
   } = data
   const paymentFrequency = calculateMonthlyPayment(payFrequency, mortgageAmount, interest, loanTerm.months)
 
@@ -33,11 +34,12 @@ export default data => {
     paymentFrequency,
     mortgageAmount,
     interest,
-    loanTerm,
     oneTime,
     monthlyOrBiWeekly,
     quarterly,
     yearly,
+    null,
+    startDate,
   )
 
   const principal = mortgageAmount - totalExtraPaymentAndInterest.totalExtraPayment
