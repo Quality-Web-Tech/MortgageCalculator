@@ -1,65 +1,14 @@
 import React from 'react'
-import calculateExtraPaymentsAndInterest from './calculateExtraPaymentAndInterest'
 import {FontAwesome5, MaterialCommunityIcons, Fontisto} from '@expo/vector-icons'
 import colors from '../styles/colors'
-import {calculateMonthlyPayment} from '../utils/calculateMonthlyPayment'
+import {calculateVariables} from './calculations'
 
 const calcPercentage = (total, val) => Number(((val / total) * 100).toFixed(2))
 
 export default data => {
-  let {
-    homeValue,
-    paymentFrequency: payFrequency,
-    mortgageAmount, // 12 months per year, monthly interest
-    interest,
-    loanTerm,
-    monthlyOrBiWeekly,
-    propertyTax,
-    homeInsurance,
-    pmi,
-    hoaFees,
-    downPayment,
-    oneTime,
-    quarterly,
-    yearly,
-    startDate,
-  } = data
-  const paymentFrequency = calculateMonthlyPayment(payFrequency, mortgageAmount, interest, loanTerm.months)
-  const isMonthly = paymentFrequency.type === 'Monthly' ? true : false
+  let {downPayment} = data
 
-  propertyTax = isMonthly ? propertyTax.amount / 12 : propertyTax.amount / 26
-  homeInsurance = isMonthly ? homeInsurance.amount / 12 : homeInsurance.amount / 26
-  pmi =
-    downPayment.percent < 20
-      ? isMonthly
-        ? (mortgageAmount * pmi.percent) / 1200
-        : (mortgageAmount * pmi.percent) / 2600
-      : 0
-  hoaFees = isMonthly ? hoaFees : (hoaFees * 12) / 26
-  const pmiThreshhold = homeValue - homeValue * 0.2 // downpayment and loan princiapl paid reach 20% stop pmi
-
-  const {totalExtraPayment, months, totalInterest, pmiDuration} = calculateExtraPaymentsAndInterest(
-    paymentFrequency,
-    mortgageAmount,
-    interest,
-    oneTime,
-    monthlyOrBiWeekly,
-    quarterly,
-    yearly,
-    pmiThreshhold,
-    startDate,
-  )
-
-  const principal = mortgageAmount - totalExtraPayment
-
-  const totalFessMonths = isMonthly ? 0 : 3
-
-  const totalTax = propertyTax * (months - totalFessMonths)
-  const totalInsurance = homeInsurance * (months - totalFessMonths)
-  const totalPMI = pmi * pmiDuration
-  const totalHoaFees = hoaFees * (months - totalFessMonths)
-  const totalFees = totalTax + totalInsurance + totalPMI + totalHoaFees
-  const totalAllPayments = totalFees + totalInterest + mortgageAmount + downPayment.amount
+  const {principal, totalAllPayments, totalInterest, totalFees} = calculateVariables(data)
 
   const interestPrincipalPercentage = []
 

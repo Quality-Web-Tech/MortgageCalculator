@@ -1,71 +1,27 @@
-import calculateExtraPaymentsAndInterest from './calculateExtraPaymentAndInterest'
 import {formatDate} from '../utils/formatter'
+import {calculateVariables} from './calculations'
 import moment from 'moment'
-import {calculateMonthlyPayment} from '../utils/calculateMonthlyPayment'
 
 export default data => {
-  let {
-    homeValue,
-    mortgageAmount,
-    interest,
-    loanTerm,
-    monthlyOrBiWeekly,
-    propertyTax,
-    paymentFrequency: payFrequency,
-    homeInsurance,
-    pmi,
-    hoaFees,
-    startDate,
-    oneTime,
-    quarterly,
-    yearly,
-    downPayment,
-  } = data
+  let {homeValue, mortgageAmount, startDate, downPayment} = data
 
-  const paymentFrequency = calculateMonthlyPayment(payFrequency, mortgageAmount, interest, loanTerm.months)
-  const isMonthly = paymentFrequency.type === 'Monthly' ? true : false
-  const monthlyOrBiWeeklyPayment = monthlyOrBiWeekly.payment
-  propertyTax = isMonthly ? propertyTax.amount / 12 : propertyTax.amount / 26
-
-  homeInsurance = isMonthly ? homeInsurance.amount / 12 : homeInsurance.amount / 26
-
-  pmi =
-    downPayment.percent < 20
-      ? isMonthly
-        ? (mortgageAmount * pmi.percent) / 1200
-        : (mortgageAmount * pmi.percent) / 2600
-      : 0
-  hoaFees = isMonthly ? hoaFees : (hoaFees * 12) / 26
-
-  const totalPaymentMonthly =
-    paymentFrequency.amount + monthlyOrBiWeeklyPayment + propertyTax + homeInsurance + pmi + hoaFees
-  const pmiThreshhold = homeValue - homeValue * 0.2 // downpayment and loan princiapl paid reach 20% stop pmi
-
-  const {totalExtraPayment, months, totalInterest, pmiDuration} = calculateExtraPaymentsAndInterest(
+  const {
     paymentFrequency,
-    mortgageAmount,
-    interest,
-    oneTime,
-    monthlyOrBiWeekly,
-    quarterly,
-    yearly,
-    pmiThreshhold,
-    startDate,
-  )
-
-  const principal = mortgageAmount - totalExtraPayment
-
-  const endDateEx = isMonthly ? months : Math.floor((months / 26) * 12) - 1
-  const endDate = moment(startDate).add(endDateEx, 'months') // Subracted extra month
-
-  const totalFessMonths = isMonthly ? 0 : 3
-
-  const totalTax = propertyTax * (months - totalFessMonths)
-  const totalInsurance = homeInsurance * (months - totalFessMonths)
-  const totalPMI = pmi * pmiDuration
-  const totalHoaFees = hoaFees * (months - totalFessMonths)
-  const totalFees = totalTax + totalInsurance + totalPMI + totalHoaFees // PMI not required if downpayment is 20%
-  const totalAllPayments = totalFees + totalInterest + mortgageAmount + downPayment.amount
+    principal,
+    totalPaymentMonthly,
+    endDate,
+    totalAllPayments,
+    months,
+    totalExtraPayment,
+    totalInterest,
+    totalFees,
+    monthlyOrBiWeeklyPayment,
+    pmiDuration,
+    propertyTax,
+    homeInsurance,
+    hoaFees,
+    pmi,
+  } = calculateVariables(data)
 
   return [
     {

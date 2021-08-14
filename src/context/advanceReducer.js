@@ -1,5 +1,4 @@
 import {unformat} from '../utils/formatter'
-import {calculateMonthlyPaymentRaw} from '../utils/calculateMonthlyPayment'
 
 export default (state, action) => {
   switch (action.type) {
