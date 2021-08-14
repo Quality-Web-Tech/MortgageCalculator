@@ -97,12 +97,13 @@ export default {
   chartExpenseContainer: {
     flex: 1,
     marginBottom: 16,
-    marginLeft: 16,
+    marginLeft: 10,
     paddingBottom: 8,
     borderBottomWidth: 1,
     borderBottomColor: colors.gray300,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
 
   chartExpenseLabel: {

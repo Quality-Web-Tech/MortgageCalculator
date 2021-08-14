@@ -8,6 +8,7 @@ const calcPercentage = (total, val) => Number(((val / total) * 100).toFixed(2))
 
 export default data => {
   let {
+    homeValue,
     paymentFrequency: payFrequency,
     mortgageAmount, // 12 months per year, monthly interest
     interest,
@@ -24,13 +25,20 @@ export default data => {
     startDate,
   } = data
   const paymentFrequency = calculateMonthlyPayment(payFrequency, mortgageAmount, interest, loanTerm.months)
+  const isMonthly = paymentFrequency.type === 'Monthly' ? true : false
 
-  propertyTax = paymentFrequency.type === 'Monthly' ? propertyTax.amount / 12 : propertyTax.amount / 12 / 2
-  homeInsurance = paymentFrequency.type === 'Monthly' ? homeInsurance.amount / 12 : homeInsurance.amount / 12 / 2
-  pmi = paymentFrequency.type === 'Monthly' ? pmi.amount / 12 : pmi.amount / 12 / 2
-  hoaFees = paymentFrequency.type === 'Monthly' ? hoaFees : hoaFees / 2
+  propertyTax = isMonthly ? propertyTax.amount / 12 : propertyTax.amount / 26
+  homeInsurance = isMonthly ? homeInsurance.amount / 12 : homeInsurance.amount / 26
+  pmi =
+    downPayment.percent < 20
+      ? isMonthly
+        ? (mortgageAmount * pmi.percent) / 1200
+        : (mortgageAmount * pmi.percent) / 2600
+      : 0
+  hoaFees = isMonthly ? hoaFees : (hoaFees * 12) / 26
+  const pmiThreshhold = homeValue - homeValue * 0.2 // downpayment and loan princiapl paid reach 20% stop pmi
 
-  const totalExtraPaymentAndInterest = calculateExtraPaymentsAndInterest(
+  const {totalExtraPayment, months, totalInterest, pmiDuration} = calculateExtraPaymentsAndInterest(
     paymentFrequency,
     mortgageAmount,
     interest,
@@ -38,37 +46,40 @@ export default data => {
     monthlyOrBiWeekly,
     quarterly,
     yearly,
-    null,
+    pmiThreshhold,
     startDate,
   )
 
-  const principal = mortgageAmount - totalExtraPaymentAndInterest.totalExtraPayment
+  const principal = mortgageAmount - totalExtraPayment
 
-  const totalTax = propertyTax * totalExtraPaymentAndInterest.months
-  const totalInsurance = homeInsurance * totalExtraPaymentAndInterest.months
-  const totalPMI = pmi * 45 // Default value is 44 months. In the actual app the default is 44 months
-  const totalFees = totalTax + totalInsurance + totalPMI + hoaFees * loanTerm.months
-  const totalAllPayments = totalFees + totalExtraPaymentAndInterest.totalInterest + mortgageAmount + downPayment.amount
+  const totalFessMonths = isMonthly ? 0 : 3
+
+  const totalTax = propertyTax * (months - totalFessMonths)
+  const totalInsurance = homeInsurance * (months - totalFessMonths)
+  const totalPMI = pmi * pmiDuration
+  const totalHoaFees = hoaFees * (months - totalFessMonths)
+  const totalFees = totalTax + totalInsurance + totalPMI + totalHoaFees
+  const totalAllPayments = totalFees + totalInterest + mortgageAmount + downPayment.amount
 
   const interestPrincipalPercentage = []
 
-  const principalPercent = calcPercentage(totalAllPayments, principal)
-  const interestPercent = calcPercentage(totalAllPayments, totalExtraPaymentAndInterest.totalInterest)
-  const downPaymentPercent = calcPercentage(totalAllPayments, downPayment.amount)
-  const totalFeesPercent = calcPercentage(totalAllPayments, totalFees)
+  const principalPercent = Number(calcPercentage(totalAllPayments, principal).toFixed(1))
+  const interestPercent = Number(calcPercentage(totalAllPayments, totalInterest).toFixed(1))
+  const downPaymentPercent = Number(calcPercentage(totalAllPayments, downPayment.amount).toFixed(1))
+  const totalFeesPercent = Number(calcPercentage(totalAllPayments, totalFees).toFixed(1))
 
   interestPrincipalPercentage.push({
     label: `Principal`,
     percent: principalPercent,
     total: principal,
-    icon: <FontAwesome5 name="piggy-bank" color={colors.green} size={18} />,
+    icon: <FontAwesome5 name="piggy-bank" color={colors.green} size={16} />,
     color: colors.green,
   })
   interestPrincipalPercentage.push({
     label: `Interest`,
     percent: interestPercent,
-    total: totalExtraPaymentAndInterest.totalInterest,
-    icon: <MaterialCommunityIcons name="percent" color={colors.orange} size={18} />,
+    total: totalInterest,
+    icon: <MaterialCommunityIcons name="percent" color={colors.orange} size={16} />,
     color: colors.orange,
   })
 
@@ -76,7 +87,7 @@ export default data => {
     label: `Down Payment`,
     percent: downPaymentPercent,
     total: downPayment.amount,
-    icon: <Fontisto name="wallet" color={colors.cyan} size={18} />,
+    icon: <Fontisto name="wallet" color={colors.cyan} size={16} />,
     color: colors.cyan,
   })
 
@@ -84,7 +95,7 @@ export default data => {
     label: `Tax, Insurance, PMI & Fess`,
     percent: totalFeesPercent,
     total: totalFees,
-    icon: <FontAwesome5 name="wallet" color={colors.pink} size={18} />,
+    icon: <FontAwesome5 name="wallet" color={colors.pink} size={16} />,
     color: colors.pink,
   })
 

@@ -1,20 +1,23 @@
 import React, {useState} from 'react'
-import {Text, View} from 'react-native'
+import {Text, View, useWindowDimensions} from 'react-native'
 import styles from 'styles/styles'
 import {Container, FlatList} from 'components'
 import {useAdvanceStateMortgageCalculator} from '../../../context/advanceMortgageCalculator'
-import {formatNumber} from 'utils/formatter'
 import {PieChart} from 'react-native-svg-charts'
 import calculateAdvanceChart from '../../../utils/calculateAdvanceChart'
 import numbro from 'numbro'
 
 function ListItem({data}) {
   const {label, total, percent, icon} = data
+  const screenWidth = useWindowDimensions().width
+
   return (
     <View style={{flexDirection: 'row'}}>
       {icon}
       <View style={styles.chartExpenseContainer}>
-        <Text style={styles.chartExpenseLabel}>{`${label} (${percent}%)`}</Text>
+        <Text
+          style={[styles.chartExpenseLabel, {fontSize: screenWidth < 380 ? 10 : 14}]}
+        >{`${label} (${percent}%)`}</Text>
         <Text style={styles.chartExpenseTotal}>${numbro(total).format({thousandSeparated: true, mantissa: 2})}</Text>
       </View>
     </View>
