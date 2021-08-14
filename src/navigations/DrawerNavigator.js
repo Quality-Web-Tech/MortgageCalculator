@@ -37,7 +37,7 @@ const SideBar = ({navigation}) => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('About')}>
             <Text style={{fontSize: 14, color: colors.gray600, fontFamily: fontFamily.MONTSERRAT_SEMIBOLD}}>About</Text>
           </TouchableOpacity>
         </View>
